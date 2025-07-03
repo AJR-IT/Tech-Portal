@@ -11,14 +11,14 @@ use Doctrine\ORM\EntityManagerInterface;
 final class Status implements InstallerEntityInterface
 {
     private array $statuses = [];
+
     public function __construct(
-        private EntityManagerInterface $entityManager,
+        private readonly EntityManagerInterface $entityManager,
     ) {
     }
 
     public function initialize(): void
     {
-        $status = new StatusEntity();
         $this->statuses = [
             ['fullName' => 'Open', 'friendlyName' => 'Open', 'description' => 'Open and no actions performed', 'deletable' => false],
             ['fullName' => 'In Progress', 'friendlyName' => 'In Progress', 'description' => 'Open and currently being attended to', 'deletable' => false],
@@ -28,6 +28,7 @@ final class Status implements InstallerEntityInterface
         ];
 
         foreach ($this->statuses as $s) {
+            $status = new StatusEntity();
             $status->setFullName($s['fullName'])
                 ->setFriendlyName($s['friendlyName'])
                 ->setDescription($s['description'])

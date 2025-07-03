@@ -3,3 +3,9 @@ controllers:
         path: ../src/Controller/
         namespace: App\Controller
     type: attribute
+
+install:
+    resource:
+        path: ../src/Install/Controller
+        namespace: App\Install\Controller
+    type: attribute
