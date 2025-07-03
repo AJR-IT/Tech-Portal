@@ -5,9 +5,6 @@ namespace App\Entity;
 use App\Repository\TicketHistoryRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * todo Add TicketActions entity
- */
 #[ORM\Entity(repositoryClass: TicketHistoryRepository::class)]
 class TicketHistory
 {
