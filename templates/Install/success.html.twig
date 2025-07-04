@@ -1,0 +1,19 @@
+{% extends 'install/base.html.twig' %}
+
+{% block error %}
+    {% if messages is defined and messages|length > 0 %}
+        <div id="globalError" class="alert alert-{{ messages.level }} d-none" role="alert">
+            {{ messages.message }}
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block steps %}
+    <div class="mb-3">
+        {% if success is true %}
+            Tech portal has been successfully installed.
+        {% else %}
+            There was a problem installing the software.
+        {% endif %}
+    </div>
+{% endblock %}

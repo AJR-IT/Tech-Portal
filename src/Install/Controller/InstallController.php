@@ -65,7 +65,6 @@ class InstallController extends AbstractController
 
         if ($installForm->isSubmitted() && $installForm->isValid()) {
             $data = $installForm->getData();
-            dd($data);
 //
 //            $users = $this->entityManager->getRepository(User::class)->findAll();
 //
@@ -104,19 +103,19 @@ class InstallController extends AbstractController
 //            $this->setStatus();
 //            $this->setTag();
 //
-//            if (!$this->errorInstalling) {
-//                $this->lockInstaller();
+            if (!$this->errorInstalling) {
+                $this->lockInstaller();
+
+                $this->addFlash('success', 'Installation successful');
+
+                return $this->redirectToRoute('install_success', ['success' => true]);
+            }
 //
-//                $this->addFlash('success', 'Installation successful');
-//
-//                return $this->redirectToRoute('install_success');
-//            }
-//
-//            return $this->render('install/error.html.twig', [
-//                'form' => $installForm->createView(),
-//                'data' => $data,
-//                'messages' => $this->messages,
-//            ]);
+            return $this->render('install/error.html.twig', [
+                'form' => $installForm->createView(),
+                'data' => $data,
+                'messages' => $this->messages,
+            ]);
         }
 
         return $this->render('install/index.html.twig', [
@@ -126,9 +125,11 @@ class InstallController extends AbstractController
     }
 
     #[Route('/install/success', name: 'install_success')]
-    public function installSuccess(): Response
+    public function installSuccess(bool $success = false): Response
     {
-        return $this->render('install/success.html.twig');
+        return $this->render('install/success.html.twig', [
+            'success' => $success,
+        ]);
     }
 
     /**
@@ -234,8 +235,8 @@ class InstallController extends AbstractController
                 'type' => PasswordType::class,
                 'first_options' => [
                     'label' => 'Password',
-                    'hash_property_path' => 'password',
                     'attr' => [
+                        'minlength' => 6,
                         'class' => 'form-control',
                     ],
                     'label_attr' => [
@@ -251,7 +252,6 @@ class InstallController extends AbstractController
                         'class' => 'form-label',
                     ],
                 ],
-                'mapped' => false,
             ])
             ->add('firstName', TextType::class, [
                 'label' => 'First Name',
