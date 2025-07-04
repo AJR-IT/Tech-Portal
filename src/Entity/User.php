@@ -90,6 +90,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Ticket::class, mappedBy: 'closedBy')]
     private Collection $closedTickets;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $firstName = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $lastName = null;
+
+    #[ORM\Column]
+    private bool $enabled = true;
+
+    #[ORM\Column]
+    private bool $canLogIn = false;
+
     public function __construct()
     {
         $this->ticketsSubmitted = new ArrayCollection();
@@ -437,6 +449,54 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $closedTicket->setClosedBy(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getFirstName(): ?string
+    {
+        return $this->firstName;
+    }
+
+    public function setFirstName(?string $firstName): static
+    {
+        $this->firstName = $firstName;
+
+        return $this;
+    }
+
+    public function getLastName(): ?string
+    {
+        return $this->lastName;
+    }
+
+    public function setLastName(?string $lastName): static
+    {
+        $this->lastName = $lastName;
+
+        return $this;
+    }
+
+    public function isEnabled(): ?bool
+    {
+        return $this->enabled;
+    }
+
+    public function setEnabled(bool $enabled): static
+    {
+        $this->enabled = $enabled;
+
+        return $this;
+    }
+
+    public function isCanLogIn(): ?bool
+    {
+        return $this->canLogIn;
+    }
+
+    public function setCanLogIn(bool $canLogIn): static
+    {
+        $this->canLogIn = $canLogIn;
 
         return $this;
     }

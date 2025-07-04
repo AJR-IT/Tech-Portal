@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Install\Controller;
 
+use App\Entity\Config;
+use App\Entity\User;
 use App\Install\Entity\Status;
 use App\Install\Entity\Tag;
 use App\Install\Entity\UserGroup;
@@ -21,7 +23,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/install', name: 'install_')]
 class InstallController extends AbstractController
 {
     /**
@@ -47,11 +48,8 @@ class InstallController extends AbstractController
 
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
-//        private readonly UserPasswordHasherInterface $passwordHasher,
+        private readonly UserPasswordHasherInterface $passwordHasher,
     ) {
-        if ($this->verifyInstalled()) {
-            throw new \RuntimeException('Illegal action, installation already succeeded.');
-        }
     }
 
     /**
@@ -59,92 +57,79 @@ class InstallController extends AbstractController
      *
      * @return Response
      */
-    #[Route('/index', name: 'index')]
-    public function index(): Response
+    #[Route('/install', name: 'install_index')]
+    public function index(Request $request): Response
     {
-        if ($this->errorInstalling) {
-            return $this->failInstallation();
+        // If install.lock exists, exit installer
+        if ($this->verifyInstalled()) {
+            return $this->redirectToRoute('app_index');
         }
 
-        return $this->render('install/index.html.twig', [
+        $installForm = $this->setUpInstallationForm();
+        $installForm->handleRequest($request);
+
+        if ($installForm->isSubmitted() && $installForm->isValid()) {
+            $data = $installForm->getData();
+
+            $users = $this->entityManager->getRepository(User::class)->findAll();
+
+            if (count($users) > 0) {
+                foreach ($users as $user) {
+                    $this->entityManager->remove($user);
+                }
+
+                $this->entityManager->flush();
+            }
+
+            // Set up user
+            $user = new User();
+            $user->setEmail($data['email'])
+                ->setUsername($data['username'])
+                ->setPassword($this->passwordHasher->hashPassword($user, $data['plainPassword']))
+                ->setCanLogIn(true)
+                ->setFirstName($data['firstName'])
+                ->setLastName($data['lastName'])
+            ;
+
+            $this->entityManager->persist($user);
+
+            // Set up config
+            foreach (['siteName' => $data['siteName'], 'siteUrl' => $data['siteUrl']] as $key => $val) {
+                $config = new Config();
+                $config->setConfigKey($key)
+                    ->setConfigValue($val)
+                ;
+            }
+
+            $this->entityManager->persist($config);
+            $this->entityManager->flush();
+
+            $this->setUserGroup();
+            $this->setStatus();
+            $this->setTag();
+
+            if (!$this->errorInstalling) {
+                $this->lockInstaller();
+                return $this->redirectToRoute('install_success');
+            }
+
+            return $this->render('install/index.html.twig', [
+                'form' => $installForm->createView(),
+                'data' => $data,
+                'messages' => $this->messages,
+            ]);
+        }
+
+        return $this->render('install/welcome.html.twig', [
+            'form' => $installForm->createView(),
             'messages' => $this->messages,
         ]);
     }
 
-    #[Route('/user-setup', name: 'user_setup')]
-    public function stepUserSetup(Request $request): Response
+    #[Route('/install/success', name: 'install_success')]
+    public function installSuccess(): Response
     {
-        if ($this->errorInstalling) {
-            return $this->failInstallation();
-        }
-
-        return $this->render('install/user_setup.html.twig', [
-            'form' => $this->createUserForm()->createView(),
-            'messages' => $this->messages,
-        ]);
-    }
-
-    #[Route('/user-group-setup', name: 'user_group_setup')]
-    public function stepUserGroupSetup(Request $request): Response
-    {
-        $this->setUserGroup();
-
-        if ($this->errorInstalling) {
-            return $this->failInstallation();
-        }
-
-        return $this->render('install/user_group_setup.html.twig', [
-            'messages' => $this->messages,
-        ]);
-    }
-
-    #[Route('/status-setup', name: 'status_setup')]
-    public function stepStatusSetup(Request $request): Response
-    {
-        $this->setStatus();
-
-        if ($this->errorInstalling) {
-            return $this->failInstallation();
-        }
-
-        return $this->render('install/status_setup.html.twig', [
-            'messages' => $this->messages,
-        ]);
-    }
-
-    #[Route('/tags-setup', name: 'tags_setup')]
-    public function stepTagsSetup(Request $request): Response
-    {
-        $this->setTag();
-
-        if ($this->errorInstalling) {
-            return $this->failInstallation();
-        }
-
-        return $this->render('install/tags_setup.html.twig', [
-            'messages' => $this->messages,
-        ]);
-    }
-
-    public function stepFinal(Request $request): Response
-    {
-        $tag = new Tag($this->entityManager);
-        $status = new Status($this->entityManager);
-        $userGroup = new UserGroup($this->entityManager);
-
-        if (
-            !$tag->verify() ||
-            !$status->verify() ||
-            !$userGroup->verify() ||
-            !$this->errorInstalling
-        ) {
-            return $this->failInstallation();
-        }
-
-        // All checks passed
-        return $this->render('install/final_setup.html.twig', [
-            'messages' => $this->messages,
-        ]);
+        return $this->render('install/success.html.twig');
     }
 
     /**
@@ -158,18 +143,18 @@ class InstallController extends AbstractController
 
         $locked = $filesystem->exists(__DIR__ . '/../../../var/install.lock');
 
-        if ($locked !== false) {
-            $this->successfullyInstalled = true;
-            $this->messages[] = [
-                'level' => 'info',
-                'message' => 'Installation is already installed',
-                'fullMessage' => ''
-            ];
-
-            return true;
+        if ($locked === false) {
+            return false;
         }
 
-        return false;
+        $this->successfullyInstalled = true;
+        $this->messages[] = [
+            'level' => 'info',
+            'message' => 'Installation is already installed',
+            'fullMessage' => ''
+        ];
+
+        return true;
     }
 
     /**
@@ -186,7 +171,7 @@ class InstallController extends AbstractController
         } catch (IOException $e) {
             $this->successfullyInstalled = false;
             $this->messages[] = [
-                'level' => 'error',
+                'level' => 'danger',
                 'message' => 'Unable to create lock file',
                 'fullMessage' => $e->getMessage()
             ];
@@ -205,9 +190,14 @@ class InstallController extends AbstractController
      *
      * @return FormInterface
      */
-    private function createUserForm(): FormInterface
+    private function setUpInstallationForm(): FormInterface
     {
         return $this->createFormBuilder()
+            // App name & url
+            ->add('siteName', TextType::class)
+            ->add('siteUrl', TextType::class)
+
+            // Admin Account
             ->add('username', TextType::class, [
                 'required' => true,
             ])
@@ -239,7 +229,7 @@ class InstallController extends AbstractController
 
         if ($status->verify() === false) {
             $this->errorInstalling = true;
-            $this->messages[] = ['level' => 'error', 'message' => 'Failed to create statuses', 'fullMessage' => ''];
+            $this->messages[] = ['level' => 'danger', 'message' => 'Failed to create statuses', 'fullMessage' => ''];
         }
     }
 
@@ -255,7 +245,7 @@ class InstallController extends AbstractController
 
         if ($tag->verify() === false) {
             $this->errorInstalling = true;
-            $this->messages[] = ['level' => 'error', 'message' => 'Failed to create tags', 'fullMessage' => ''];
+            $this->messages[] = ['level' => 'danger', 'message' => 'Failed to create tags', 'fullMessage' => ''];
         }
     }
 
@@ -271,7 +261,7 @@ class InstallController extends AbstractController
 
         if ($userGroup->verify() === false) {
             $this->errorInstalling = true;
-            $this->messages[] = ['level' => 'error', 'message' => 'Failed to create user groups', 'fullMessage' => ''];
+            $this->messages[] = ['level' => 'danger', 'message' => 'Failed to create user groups', 'fullMessage' => ''];
         }
     }
 }
