@@ -9,7 +9,6 @@ use App\Entity\User;
 use App\Install\Entity\Status;
 use App\Install\Entity\Tag;
 use App\Install\Entity\UserGroup;
-use Doctrine\DBAL\Types\TextType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Filesystem\Exception\IOException;
@@ -17,6 +16,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,13 +25,6 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class InstallController extends AbstractController
 {
-    /**
-     * True if install process successful
-     *
-     * @var bool
-     */
-    private bool $successfullyInstalled = false;
-
     /**
      * True if install process had an error
      *
@@ -55,6 +48,7 @@ class InstallController extends AbstractController
     /**
      * Landing page for installation
      *
+     * @param Request $request
      * @return Response
      */
     #[Route('/install', name: 'install_index')]
@@ -110,17 +104,20 @@ class InstallController extends AbstractController
 
             if (!$this->errorInstalling) {
                 $this->lockInstaller();
+
+                $this->addFlash('success', 'Installation successful');
+
                 return $this->redirectToRoute('install_success');
             }
 
-            return $this->render('install/index.html.twig', [
+            return $this->render('install/error.html.twig', [
                 'form' => $installForm->createView(),
                 'data' => $data,
                 'messages' => $this->messages,
             ]);
         }
 
-        return $this->render('install/welcome.html.twig', [
+        return $this->render('install/index.html.twig', [
             'form' => $installForm->createView(),
             'messages' => $this->messages,
         ]);
@@ -147,7 +144,8 @@ class InstallController extends AbstractController
             return false;
         }
 
-        $this->successfullyInstalled = true;
+        $this->errorInstalling = false;
+
         $this->messages[] = [
             'level' => 'info',
             'message' => 'Installation is already installed',
@@ -169,7 +167,8 @@ class InstallController extends AbstractController
         try {
             $filesystem->touch(__DIR__ . '/../../../var/install.lock');
         } catch (IOException $e) {
-            $this->successfullyInstalled = false;
+            $this->errorInstalling = true;
+
             $this->messages[] = [
                 'level' => 'danger',
                 'message' => 'Unable to create lock file',
@@ -178,15 +177,8 @@ class InstallController extends AbstractController
         }
     }
 
-    private function failInstallation(): Response
-    {
-        return $this->render('install/error.html.twig', [
-            'messages' => $this->messages,
-        ]);
-    }
-
     /**
-     * Creates a new user form
+     * Creates the installation form
      *
      * @return FormInterface
      */
@@ -209,7 +201,6 @@ class InstallController extends AbstractController
                 'first_options' => ['label' => 'Password', 'hash_property_path' => 'password'],
                 'second_options' => ['label' => 'Repeat Password'],
                 'mapped' => false,
-                'toggle' => true,
             ])
             ->add('firstName', TextType::class)
             ->add('lastName', TextType::class)
@@ -229,7 +220,12 @@ class InstallController extends AbstractController
 
         if ($status->verify() === false) {
             $this->errorInstalling = true;
-            $this->messages[] = ['level' => 'danger', 'message' => 'Failed to create statuses', 'fullMessage' => ''];
+
+            $this->messages[] = [
+                'level' => 'danger',
+                'message' => 'Failed to create statuses',
+                'fullMessage' => ''
+            ];
         }
     }
 
@@ -245,7 +241,12 @@ class InstallController extends AbstractController
 
         if ($tag->verify() === false) {
             $this->errorInstalling = true;
-            $this->messages[] = ['level' => 'danger', 'message' => 'Failed to create tags', 'fullMessage' => ''];
+
+            $this->messages[] = [
+                'level' => 'danger',
+                'message' => 'Failed to create tags',
+                'fullMessage' => ''
+            ];
         }
     }
 
@@ -261,7 +262,12 @@ class InstallController extends AbstractController
 
         if ($userGroup->verify() === false) {
             $this->errorInstalling = true;
-            $this->messages[] = ['level' => 'danger', 'message' => 'Failed to create user groups', 'fullMessage' => ''];
+
+            $this->messages[] = [
+                'level' => 'danger',
+                'message' => 'Failed to create user groups',
+                'fullMessage' => ''
+            ];
         }
     }
 }

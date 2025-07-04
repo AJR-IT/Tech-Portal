@@ -17,6 +17,7 @@
         "symfony/asset-mapper": "7.3.*",
         "symfony/console": "7.3.*",
         "symfony/dotenv": "7.3.*",
+        "symfony/event-dispatcher": "7.3.*",
         "symfony/filesystem": "7.3.*",
         "symfony/flex": "^2.7.1",
         "symfony/form": "7.3.*",

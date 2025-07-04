@@ -6,9 +6,11 @@ body, html {
 .install-box {
     width: 75%;
     max-width: 800px;
-    background-color: #ffffff;
+    /*background-color: #e7f1ff;*/
+    background: linear-gradient(145deg, #f0f4ff, #e9f0ff);
+    border: 1px solid #cdd8f0;
     border-radius: 1rem;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
     padding: 2rem;
     position: absolute;
     top: 50%;
