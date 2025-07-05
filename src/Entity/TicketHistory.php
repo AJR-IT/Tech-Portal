@@ -24,6 +24,9 @@ class TicketHistory
     #[ORM\JoinColumn(nullable: false)]
     private ?User $relatedUser = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $message = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -61,6 +64,18 @@ class TicketHistory
     public function setRelatedUser(?User $relatedUser): static
     {
         $this->relatedUser = $relatedUser;
+
+        return $this;
+    }
+
+    public function getMessage(): ?string
+    {
+        return $this->message;
+    }
+
+    public function setMessage(?string $message): static
+    {
+        $this->message = $message;
 
         return $this;
     }

@@ -9,6 +9,12 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: TicketActionRepository::class)]
 class TicketAction
 {
+    public const string CREATED = 'Ticket Created';
+
+    public const string CLOSED = 'Ticket Closed';
+
+    public const string RESOLVED = 'Ticket Resolved';
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]

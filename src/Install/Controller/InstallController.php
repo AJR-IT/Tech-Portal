@@ -11,6 +11,7 @@ use App\Entity\Tag as TagEntity;
 use App\Entity\Status as StatusEntity;
 use App\Install\Entity\Status;
 use App\Install\Entity\Tag;
+use App\Install\Entity\TicketAction;
 use App\Install\Entity\UserGroup;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -100,6 +101,7 @@ class InstallController extends AbstractController
             $this->setUserGroup();
             $this->setStatus();
             $this->setTag();
+            $this->setTicketActions();
 
             return (!$this->errorInstalling) ? $this->installSuccess() : $this->installFail();
         }
@@ -318,6 +320,22 @@ class InstallController extends AbstractController
             $this->messages[] = [
                 'level' => 'danger',
                 'message' => 'Failed to create tags',
+                'fullMessage' => ''
+            ];
+        }
+    }
+
+    private function setTicketActions(): void
+    {
+        $action = new TicketAction($this->entityManager);
+        $action->initialize();
+
+        if ($action->verify() === false) {
+            $this->errorInstalling = true;
+
+            $this->messages[] = [
+                'level' => 'danger',
+                'message' => 'Failed to create ticket actions',
                 'fullMessage' => ''
             ];
         }
