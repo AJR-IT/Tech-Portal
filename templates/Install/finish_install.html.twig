@@ -1,0 +1,29 @@
+{% extends 'install/base.html.twig' %}
+
+{% block error %}
+    {% if messages is defined and messages|length > 0 %}
+        {% for m in messages %}
+            <div id="globalError" class="alert alert-{{ m.level }} d-none" role="alert">
+                {{ m.message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endblock %}
+
+{% block steps %}
+    <div class="mb-3">
+        {% if success is true %}
+            Tech portal has been successfully installed. Please click <a href="{{ path('app_index') }}">here</a> to go to your application.
+
+            <p>
+                {% if messages|length > 0 %}
+                    {% for m in messages %}
+                        {{ m.message }} ({{ m.fullMessage }})<br />
+                    {% endfor %}
+                {% endif %}
+            </p>
+        {% else %}
+            There was a problem installing the software.
+        {% endif %}
+    </div>
+{% endblock %}

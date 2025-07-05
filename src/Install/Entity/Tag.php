@@ -53,7 +53,7 @@ final class Tag implements InstallerEntityInterface
         }
 
         foreach ($tags as $tag) {
-            if (!in_array($tag['fullName'], $tagArray)) {
+            if (!in_array($tag->getFullName(), $tagArray)) {
                 $errorCount++;
             }
         }

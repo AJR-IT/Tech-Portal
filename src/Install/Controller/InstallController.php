@@ -5,10 +5,14 @@ declare(strict_types=1);
 namespace App\Install\Controller;
 
 use App\Entity\Config;
-use App\Entity\User;
+use App\Entity\User as UserEntity;
+use App\Entity\UserGroup as UserGroupEntity;
+use App\Entity\Tag as TagEntity;
+use App\Entity\Status as StatusEntity;
 use App\Install\Entity\Status;
 use App\Install\Entity\Tag;
 use App\Install\Entity\UserGroup;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Filesystem\Exception\IOException;
@@ -65,57 +69,39 @@ class InstallController extends AbstractController
 
         if ($installForm->isSubmitted() && $installForm->isValid()) {
             $data = $installForm->getData();
-//
-//            $users = $this->entityManager->getRepository(User::class)->findAll();
-//
-//            if (count($users) > 0) {
-//                foreach ($users as $user) {
-//                    $this->entityManager->remove($user);
-//                }
-//
-//                $this->entityManager->flush();
-//            }
-//
-//            // Set up user
-//            $user = new User();
-//            $user->setEmail($data['email'])
-//                ->setUsername($data['username'])
-//                ->setPassword($this->passwordHasher->hashPassword($user, $data['plainPassword']))
-//                ->setCanLogIn(true)
-//                ->setFirstName($data['firstName'])
-//                ->setLastName($data['lastName'])
-//            ;
-//
-//            $this->entityManager->persist($user);
-//
-//            // Set up config
-//            foreach (['siteName' => $data['siteName'], 'siteUrl' => $data['siteUrl']] as $key => $val) {
-//                $config = new Config();
-//                $config->setConfigKey($key)
-//                    ->setConfigValue($val)
-//                ;
-//            }
-//
-//            $this->entityManager->persist($config);
-//            $this->entityManager->flush();
-//
-//            $this->setUserGroup();
-//            $this->setStatus();
-//            $this->setTag();
-//
-            if (!$this->errorInstalling) {
-                $this->lockInstaller();
 
-                $this->addFlash('success', 'Installation successful');
+            $this->clearOldData();
 
-                return $this->redirectToRoute('install_success', ['success' => true]);
+            // Set up user
+            $user = new UserEntity();
+            $user->setEmail($data['email'])
+                ->setUsername($data['username'])
+                ->setPassword($this->passwordHasher->hashPassword($user, $data['plainPassword']))
+                ->setCanLogIn(true)
+                ->setDateCreated(new DateTimeImmutable('now'))
+                ->setFirstName($data['firstName'])
+                ->setLastName($data['lastName'])
+            ;
+
+            $this->entityManager->persist($user);
+
+            // Set up config
+            foreach (['siteName' => $data['siteName'], 'siteUrl' => $data['siteUrl']] as $key => $val) {
+                $config = new Config();
+                $config->setConfigKey($key)
+                    ->setConfigValue($val)
+                    ->setDefaultValue('')
+                ;
             }
-//
-            return $this->render('install/error.html.twig', [
-                'form' => $installForm->createView(),
-                'data' => $data,
-                'messages' => $this->messages,
-            ]);
+
+            $this->entityManager->persist($config);
+            $this->entityManager->flush();
+
+            $this->setUserGroup();
+            $this->setStatus();
+            $this->setTag();
+
+            return (!$this->errorInstalling) ? $this->installSuccess() : $this->installFail();
         }
 
         return $this->render('install/index.html.twig', [
@@ -124,11 +110,23 @@ class InstallController extends AbstractController
         ]);
     }
 
-    #[Route('/install/success', name: 'install_success')]
-    public function installSuccess(bool $success = false): Response
+    private function installFail(): Response
     {
-        return $this->render('install/success.html.twig', [
-            'success' => $success,
+        $this->addFlash('error', 'Installation failed.');
+
+        return $this->render('install/finish_install.html.twig', [
+            'success' => false,
+            'messages' => $this->messages,
+        ]);
+    }
+
+    private function installSuccess(): Response
+    {
+        $this->lockInstaller();
+
+        return $this->render('install/finish_install.html.twig', [
+            'success' => true,
+            'messages' => $this->messages,
         ]);
     }
 
@@ -344,5 +342,39 @@ class InstallController extends AbstractController
                 'fullMessage' => ''
             ];
         }
+    }
+
+    private function clearOldData(): void
+    {
+        $users = $this->entityManager->getRepository(UserEntity::class)->findAll();
+        $userGroups = $this->entityManager->getRepository(UserGroupEntity::class)->findAll();
+        $tags = $this->entityManager->getRepository(TagEntity::class)->findAll();
+        $statuses = $this->entityManager->getRepository(StatusEntity::class)->findAll();
+
+        if (count($users) > 0) {
+            foreach ($users as $user) {
+                $this->entityManager->remove($user);
+            }
+        }
+
+        if (count($userGroups) > 0) {
+            foreach ($userGroups as $userGroup) {
+                $this->entityManager->remove($userGroup);
+            }
+        }
+
+        if (count($tags) > 0) {
+            foreach ($tags as $tag) {
+                $this->entityManager->remove($tag);
+            }
+        }
+
+        if (count($statuses) > 0) {
+            foreach ($statuses as $status) {
+                $this->entityManager->remove($status);
+            }
+        }
+
+        $this->entityManager->flush();
     }
 }
