@@ -36,4 +36,8 @@ return [
         'path' => './assets/installer.js',
         'entrypoint' => true,
     ],
+    'bootstrap-icons/font/bootstrap-icons.min.css' => [
+        'version' => '1.13.1',
+        'type' => 'css',
+    ],
 ];

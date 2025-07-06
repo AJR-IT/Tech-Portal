@@ -15,6 +15,7 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/ticket', name: 'app_ticket_')]
 final class TicketController extends AbstractController
 {
+    #[Route('/index', name: 'index')]
     public function index(): Response
     {
         return $this->render('ticket/index.html.twig', [
