@@ -5,15 +5,13 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>{% block title %}Tech Portal{% endblock %}</title>
         {% block stylesheets %}{% endblock %}
-        {% block javascripts %}
-            {% block importmap %}{{ importmap('app') }}{% endblock %}
-        {% endblock %}
+
     </head>
     <body>
         {% include 'partials/navbar.html.twig' %}
 
         <!-- Main Content -->
-        <div class="container-fluid content-wrapper bg-dark-subtle">
+        <div class="container-fluid content-wrapper bg-dark-subtle" style="min-height: 100vh;">
             <div class="container py-4">
                 {% block body %}
                     <h1>Welcome to Device Tracker</h1>
@@ -31,33 +29,8 @@
         </div>
 
         {% include 'partials/aside.html.twig' %}
-
-        <script>
-            const themeToggle = document.getElementById('themeToggleDropdown');
-            const savedTheme = localStorage.getItem('theme');
-            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-            function setTheme(mode) {
-                document.documentElement.setAttribute('data-bs-theme', mode);
-                localStorage.setItem('theme', mode);
-                if (themeToggle) {
-                    themeToggle.checked = (mode === 'dark');
-                }
-            }
-
-            // Init theme
-            if (savedTheme) {
-                setTheme(savedTheme);
-            } else {
-                setTheme(prefersDark ? 'dark' : 'light');
-            }
-
-            if (themeToggle) {
-                themeToggle.addEventListener('change', () => {
-                    setTheme(themeToggle.checked ? 'dark' : 'light');
-                });
-            }
-        </script>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+        {% block javascripts %}
+            {% block importmap %}{{ importmap('app') }}{% endblock %}
+        {% endblock %}
     </body>
 </html>
