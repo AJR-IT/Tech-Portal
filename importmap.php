@@ -31,6 +31,7 @@ return [
     ],
     'bootstrap/dist/js/bootstrap.bundle.min.js' => [
         'version' => '5.3.7',
+        'type' => 'js',
     ],
     'installer' => [
         'path' => './assets/installer.js',

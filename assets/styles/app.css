@@ -1,5 +1,6 @@
 body {
     min-height: 100vh;
+    background-color: var(--bs-body-bg);
 }
 
 .theme-toggle {
@@ -8,4 +9,77 @@ body {
 
 .content-wrapper {
     padding-top: 70px; /* height of navbar */
+}
+
+:root {
+    --accent-color: #dc3545; /* Bootstrap red */
+}
+
+.navbar {
+    background-color: var(--bs-light-bg-subtle);
+    border-bottom: 2px solid var(--accent-color);
+}
+
+.nav-link:hover,
+.nav-link.active {
+    color: var(--accent-color) !important;
+}
+
+.dropdown-menu {
+    border: 1px solid var(--accent-color);
+}
+
+.dropdown-item:hover {
+    background-color: var(--accent-color);
+    color: #fff;
+}
+
+.form-check-input:checked {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+}
+
+.btn-accent {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+    color: #fff;
+}
+
+.btn-accent:hover {
+    background-color: #bb2d3b;
+    border-color: #a52834;
+}
+
+#rightHoverTrigger {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 10px;
+    height: 100vh;
+    z-index: 1030;
+}
+
+#hoverAside {
+    position: fixed;
+    top: 0;
+    right: -250px;
+    width: 250px;
+    height: 100vh;
+    background-color: var(--bs-body-bg);
+    color: var(--bs-body-color);
+    transition: right 0.3s ease;
+    z-index: 1031;
+    border-left: 1px solid var(--bs-border-color);
+    overflow-y: auto;
+}
+
+#rightHoverTrigger:hover + #hoverAside,
+#hoverAside:hover {
+    right: 0;
+}
+
+.form-control[disabled],
+.form-control[readonly] {
+    border: 1px solid var(--bs-border-color);
+    border-radius: 0.375rem;
 }

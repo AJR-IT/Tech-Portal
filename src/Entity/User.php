@@ -102,6 +102,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private bool $canLogIn = false;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $defaultStartingPage = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $lastLogonDate = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $lsatLogonIp = null;
+
     public function __construct()
     {
         $this->ticketsSubmitted = new ArrayCollection();
@@ -497,6 +506,42 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setCanLogIn(bool $canLogIn): static
     {
         $this->canLogIn = $canLogIn;
+
+        return $this;
+    }
+
+    public function getDefaultStartingPage(): ?string
+    {
+        return $this->defaultStartingPage;
+    }
+
+    public function setDefaultStartingPage(?string $defaultStartingPage): static
+    {
+        $this->defaultStartingPage = $defaultStartingPage;
+
+        return $this;
+    }
+
+    public function getLastLogonDate(): ?\DateTimeImmutable
+    {
+        return $this->lastLogonDate;
+    }
+
+    public function setLastLogonDate(?\DateTimeImmutable $lastLogonDate): static
+    {
+        $this->lastLogonDate = $lastLogonDate;
+
+        return $this;
+    }
+
+    public function getLsatLogonIp(): ?string
+    {
+        return $this->lsatLogonIp;
+    }
+
+    public function setLsatLogonIp(?string $lsatLogonIp): static
+    {
+        $this->lsatLogonIp = $lsatLogonIp;
 
         return $this;
     }

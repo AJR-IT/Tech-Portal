@@ -82,6 +82,7 @@ class InstallController extends AbstractController
                 ->setDateCreated(new DateTimeImmutable('now'))
                 ->setFirstName($data['firstName'])
                 ->setLastName($data['lastName'])
+                ->setRoles(['ROLE_ADMIN'])
             ;
 
             $this->entityManager->persist($user);

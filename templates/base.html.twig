@@ -10,95 +10,54 @@
         {% endblock %}
     </head>
     <body>
+        {% include 'partials/navbar.html.twig' %}
 
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg fixed-top bg-body border-bottom">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">📦 Device Manager</a>
+        <!-- Main Content -->
+        <div class="container-fluid content-wrapper">
+            <div class="container py-4">
+                {% block body %}
+                    <h1>Welcome to Device Tracker</h1>
+                    <p class="text-muted">Manage devices, assign users, track repairs, and build reports.</p>
 
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#topNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-
-            <div class="collapse navbar-collapse justify-content-between" id="topNav">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item"><a class="nav-link active" href="#">Dashboard</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Devices</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Users</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Tickets</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Repairs</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Reports</a></li>
-                </ul>
-
-                <!-- User Dropdown -->
-                <ul class="navbar-nav mb-2 mb-lg-0">
-                    <li class="nav-item dropdown">
-                        <button class="nav-link dropdown-toggle d-flex align-items-center" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-person-circle fs-4 me-2"></i>
-                            <span>John Doe</span>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="#">👤 My Profile</a></li>
-                            <li><a class="dropdown-item" href="#">🛠 Admin Panel</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li class="px-3">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" role="switch" id="themeToggleDropdown">
-                                    <label class="form-check-label" for="themeToggleDropdown">Dark Mode</label>
-                                </div>
-                            </li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item text-danger" href="#">🚪 Sign Out</a></li>
-                        </ul>
-                    </li>
-                </ul>
+                    <!-- Example content card -->
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">Getting Started</h5>
+                            <p class="card-text">Start by adding devices or users, or import from your existing inventory system.</p>
+                        </div>
+                    </div>
+                {% endblock %}
             </div>
         </div>
-    </nav>
 
+        {% include 'partials/aside.html.twig' %}
 
-    <!-- Main Content -->
-    <div class="container-fluid content-wrapper">
-        <div class="container py-4">
-            <h1>Welcome to Device Tracker</h1>
-            <p class="text-muted">Manage devices, assign users, track repairs, and build reports.</p>
+        <script>
+            const themeToggle = document.getElementById('themeToggleDropdown');
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 
-            <!-- Example content card -->
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">Getting Started</h5>
-                    <p class="card-text">Start by adding devices or users, or import from your existing inventory system.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-        {% block body %}{% endblock %}
-    <script>
-        const themeToggle = document.getElementById('themeToggleDropdown');
-        const savedTheme = localStorage.getItem('theme');
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-        function setTheme(mode) {
-            document.documentElement.setAttribute('data-bs-theme', mode);
-            localStorage.setItem('theme', mode);
-            if (themeToggle) {
-                themeToggle.checked = (mode === 'dark');
+            function setTheme(mode) {
+                document.documentElement.setAttribute('data-bs-theme', mode);
+                localStorage.setItem('theme', mode);
+                if (themeToggle) {
+                    themeToggle.checked = (mode === 'dark');
+                }
             }
-        }
 
-        // Init theme
-        if (savedTheme) {
-            setTheme(savedTheme);
-        } else {
-            setTheme(prefersDark ? 'dark' : 'light');
-        }
+            // Init theme
+            if (savedTheme) {
+                setTheme(savedTheme);
+            } else {
+                setTheme(prefersDark ? 'dark' : 'light');
+            }
 
-        if (themeToggle) {
-            themeToggle.addEventListener('change', () => {
-                setTheme(themeToggle.checked ? 'dark' : 'light');
-            });
-        }
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+            if (themeToggle) {
+                themeToggle.addEventListener('change', () => {
+                    setTheme(themeToggle.checked ? 'dark' : 'light');
+                });
+            }
+        </script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     </body>
 </html>

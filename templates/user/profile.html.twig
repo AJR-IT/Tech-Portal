@@ -1,0 +1,89 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}My Profile{% endblock %}
+
+{% block body %}
+    <div class="container py-4">
+        <h2 class="mb-4">👤 My Profile</h2>
+        <div class="card shadow-lg border-0" style="background-color: var(--bs-light-bg-subtle);">
+            <div class="card-body">
+
+
+                <form method="post" action="{{ path('app_user_profile_update') }}">
+                    <div class="row g-4">
+                        <!-- Left Column -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Username</label>
+                                <input type="text" class="form-control" value="{{ user.username }}" disabled>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-control" value="{{ user.email }}" disabled>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">First Name</label>
+                                <input type="text" class="form-control" name="firstName" value="{{ user.firstName }}">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Last Name</label>
+                                <input type="text" class="form-control" name="lastName" value="{{ user.lastName }}">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Local ID</label>
+                                <input type="text" class="form-control" name="localId" value="{{ user.localUniqueId }}">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Government ID</label>
+                                <input type="text" class="form-control" name="govtId" value="{{ user.stateUniqueId }}">
+                            </div>
+                        </div>
+
+                        <!-- Right Column -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Default Starting Page</label>
+                                <select class="form-select" name="defaultPage">
+                                    <option value="dashboard" {{ user.defaultStartingPage == 'dashboard' ? 'selected' }}>Dashboard</option>
+                                    <option value="devices" {{ user.defaultStartingPage == 'devices' ? 'selected' }}>Devices</option>
+                                    <option value="tickets" {{ user.defaultStartingPage == 'tickets' ? 'selected' }}>Tickets</option>
+                                    <option value="reports" {{ user.defaultStartingPage == 'reports' ? 'selected' }}>Reports</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Change Password</label>
+                                <input type="password" class="form-control" name="plainPassword" placeholder="Enter new password">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Groups</label>
+                                <input type="text" class="form-control" value="{{ user.userGroups|join(', ') }}" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Assigned Device</label>
+                                <input type="text" class="form-control" value="{# {{ user.device.name ?? 'None' }} #}" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Ticket Statistics</label>
+                                <ul class="list-group">
+                                    <li class="list-group-item">Open: {# {{ user.tickets.open }} #}0</li>
+                                    <li class="list-group-item">Resolved: {{ user.resolvedTickets|length }}</li>
+                                    <li class="list-group-item">Pending: {{ user.closedTickets|length }}</li>
+                                </ul>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Last Logon</label>
+                                <input type="text" class="form-control" value="{# {{ user.lastLogonDate|date('Y-m-d H:i') }} #}today (IP: {# {{ user.lastLogonIp }} #}127.0.0.1)" disabled>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 text-end">
+                        <button type="submit" class="btn btn-primary">💾 Save Changes</button>
+                    </div>
+                </form>
+
+
+            </div>
+        </div>
+    </div>
+{% endblock %}
