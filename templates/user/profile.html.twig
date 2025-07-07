@@ -1,89 +1,149 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}My Profile{% endblock %}
+{% block title %}User Profile{% endblock %}
 
 {% block body %}
     <div class="container py-4">
-        <h2 class="mb-4">👤 My Profile</h2>
-        <div class="card shadow-lg border-0" style="background-color: var(--bs-light-bg-subtle);">
-            <div class="card-body">
+        <h2 class="mb-4">👤 User Profile</h2>
 
-
-                <form method="post" action="{{ path('app_user_profile_update') }}">
-                    <div class="row g-4">
-                        <!-- Left Column -->
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label class="form-label">Username</label>
-                                <input type="text" class="form-control" value="{{ user.username }}" disabled>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Email</label>
-                                <input type="email" class="form-control" value="{{ user.email }}" disabled>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">First Name</label>
-                                <input type="text" class="form-control" name="firstName" value="{{ user.firstName }}">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Last Name</label>
-                                <input type="text" class="form-control" name="lastName" value="{{ user.lastName }}">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Local ID</label>
-                                <input type="text" class="form-control" name="localId" value="{{ user.localUniqueId }}">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Government ID</label>
-                                <input type="text" class="form-control" name="govtId" value="{{ user.stateUniqueId }}">
-                            </div>
-                        </div>
-
-                        <!-- Right Column -->
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label class="form-label">Default Starting Page</label>
-                                <select class="form-select" name="defaultPage">
-                                    <option value="dashboard" {{ user.defaultStartingPage == 'dashboard' ? 'selected' }}>Dashboard</option>
-                                    <option value="devices" {{ user.defaultStartingPage == 'devices' ? 'selected' }}>Devices</option>
-                                    <option value="tickets" {{ user.defaultStartingPage == 'tickets' ? 'selected' }}>Tickets</option>
-                                    <option value="reports" {{ user.defaultStartingPage == 'reports' ? 'selected' }}>Reports</option>
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Change Password</label>
-                                <input type="password" class="form-control" name="plainPassword" placeholder="Enter new password">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Groups</label>
-                                <input type="text" class="form-control" value="{{ user.userGroups|join(', ') }}" readonly>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Assigned Device</label>
-                                <input type="text" class="form-control" value="{# {{ user.device.name ?? 'None' }} #}" readonly>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Ticket Statistics</label>
-                                <ul class="list-group">
-                                    <li class="list-group-item">Open: {# {{ user.tickets.open }} #}0</li>
-                                    <li class="list-group-item">Resolved: {{ user.resolvedTickets|length }}</li>
-                                    <li class="list-group-item">Pending: {{ user.closedTickets|length }}</li>
-                                </ul>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Last Logon</label>
-                                <input type="text" class="form-control" value="{# {{ user.lastLogonDate|date('Y-m-d H:i') }} #}today (IP: {# {{ user.lastLogonIp }} #}127.0.0.1)" disabled>
-                            </div>
-                        </div>
+        <div class="row">
+            <!-- Left Column -->
+            <div class="col-md-4">
+                <!-- User Identity -->
+                <div class="card mb-4 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ (user.lastName ~ user.firstName) is not null ? 'Identity' }}</h5>
+                        <p class="mb-1"><strong>Username:</strong> {{ user.username }}</p>
+                        <p class="mb-1"><strong>Email:</strong> {{ user.email}}</p>
                     </div>
+                </div>
 
-                    <div class="mt-4 text-end">
-                        <button type="submit" class="btn btn-primary">💾 Save Changes</button>
+                <!-- Ticket Statistics -->
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">Ticket Statistics</h5>
+                        <p class="mb-1">🎫 Open: 5</p>
+                        <p class="mb-1">✅ Resolved: 12</p>
+                        <p class="mb-1">⏳ Pending: 3</p>
+                        <p class="mb-1">🕓 Last Login: 2025-07-05 10:32</p>
+                        <p class="mb-1">🌐 Last IP: 192.168.1.100</p>
                     </div>
-                </form>
-
-
+                </div>
             </div>
+
+            <!-- Right Column -->
+            <div class="col-md-8">
+                <!-- Assigned Tickets -->
+                <div class="card mb-4 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">Assigned Tickets</h5>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item ticket-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span class="fw-medium">ticket.titlce</span>
+                                    <br>
+                                    <small class="text-muted">#id • ticket.status</small>
+                                </div>
+                                <a href="{# {{ path('ticket_show', { id: ticket.id }) }}#}" class="btn btn-sm btn-outline-primary">View</a>
+                            </li>
+                            <li class="list-group-item ticket-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span class="fw-medium">ticket.titlce</span>
+                                    <br>
+                                    <small class="text-muted">#id • ticket.status</small>
+                                </div>
+                                <a href="{# {{ path('ticket_show', { id: ticket.id }) }}#}" class="btn btn-sm btn-outline-primary">View</a>
+                            </li>
+                            <li class="list-group-item ticket-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span class="fw-medium">ticket.titlce</span>
+                                    <br>
+                                    <small class="text-muted">#id • ticket.status</small>
+                                </div>
+                                <a href="{# {{ path('ticket_show', { id: ticket.id }) }}#}" class="btn btn-sm btn-outline-primary">View</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Edit Profile Accordion -->
+                <div class="accordion shadow-sm" id="profileAccordion">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="editProfileHeading">
+                            <button class="accordion-button collapsed" type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#editProfileCollapse"
+                                    aria-expanded="false"
+                                    aria-controls="editProfileCollapse">
+                                ✏️ Edit Profile
+                            </button>
+                        </h2>
+                        <div id="editProfileCollapse" class="accordion-collapse collapse"
+                             aria-labelledby="editProfileHeading">
+                            <div class="accordion-body">
+                                <form method="post" action="#">
+                                    <div class="row mb-3">
+                                        <div class="col">
+                                            <label for="firstName" class="form-label">First Name</label>
+                                            <input type="text" class="form-control" id="firstName" value="John">
+                                        </div>
+                                        <div class="col">
+                                            <label for="lastName" class="form-label">Last Name</label>
+                                            <input type="text" class="form-control" id="lastName" value="Doe">
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="localId" class="form-label">Local ID</label>
+                                        <input type="text" class="form-control" id="localId" value="EMP-1001">
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="govtId" class="form-label">Government ID</label>
+                                        <input type="text" class="form-control" id="govtId" value="A123456789">
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="startPage" class="form-label">Default Start Page</label>
+                                        <select class="form-select" id="startPage">
+                                            <option selected>Dashboard</option>
+                                            <option>Tickets</option>
+                                            <option>Devices</option>
+                                            <option>Reports</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="assignedDevice" class="form-label">Assigned Device</label>
+                                        <input type="text" class="form-control" id="assignedDevice" value="Dell Latitude 5510">
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Groups</label>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" checked id="groupIT">
+                                            <label class="form-check-label" for="groupIT">IT Department</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="groupHR">
+                                            <label class="form-check-label" for="groupHR">HR Department</label>
+                                        </div>
+                                    </div>
+
+                                    <hr>
+                                    <div class="mb-3">
+                                        <label for="newPassword" class="form-label">Change Password</label>
+                                        <input type="password" class="form-control" id="newPassword">
+                                    </div>
+
+                                    <button type="submit" class="btn btn-primary">💾 Save Changes</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div> <!-- End Right Column -->
         </div>
     </div>
 {% endblock %}
