@@ -28,7 +28,9 @@
 - [ ] Needs entity
 - [ ] Copy code from current AssetManagement
 - [ ] Should this be reworked?
+- - [ ] Maybe have a set of valid storages to choose from (ie. cart, shelf, etc...)
 
 ### Collection & distribution 
 _how to handle?_
 - [ ] Collection should just place device into storage record
+- [ ] Distribution should clear that record
