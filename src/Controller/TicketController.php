@@ -3,11 +3,11 @@
 namespace App\Controller;
 
 use App\Entity\Ticket;
-use App\Entity\TicketAction;
-use App\Entity\TicketHistory;
 use App\Entity\User;
 use App\Entity\UserGroup;
+use DateTime;
 use DateTimeImmutable;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -15,6 +15,10 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/ticket', name: 'app_ticket_')]
 final class TicketController extends AbstractController
 {
+    public function __construct(private readonly EntityManagerInterface $entityManager)
+    {
+    }
+
     #[Route('/index', name: 'index')]
     public function index(): Response
     {
@@ -42,6 +46,8 @@ final class TicketController extends AbstractController
             'subject'
         ];
 
+        // TODO validate input, does it have to be here?
+
         $ticket = new Ticket();
 
         $ticket->setDateCreated(new DateTimeImmutable('now'))
@@ -50,20 +56,29 @@ final class TicketController extends AbstractController
             ->setClosedBy($data['closed_by'] ?? null)
             ->setClosedDate((!is_null($data['closed_by'])) ? new DateTimeImmutable('now') : null)
             ->setDateDue($data['date_due'] ?? null)
-            ->setDateModified(new \DateTime('now'))
+            ->setDateModified(new DateTime('now'))
             ->setOriginalMessage($data['original_message'] ?? null)
             ->setRequestingUser($data['requesting_user'] ?? null)
             ->setResolvedBy($data['resolved_user'] ?? null)
             ->setResolvedDate((!is_null($data['resolved_user'])) ? new DateTimeImmutable('now') : null)
             ->setSubject($data['subject'] ?? null)
         ;
+    }
 
-        $ticketHistory = new TicketHistory();
-
-        $ticketHistory->setTicket($ticket)
-            ->setDateCreated(new DateTimeImmutable('now'))
-            ->setRelatedUser($data['requesting_user'] ?? null)
-            ->setMessage(TicketAction::CREATED)
-        ;
+    /**
+     * Updates the provided ticket
+     *
+     * @param Ticket $ticket
+     * @param User $modifiedBy
+     *
+     * @return void
+     */
+    private function updateTicket(Ticket $ticket, User $modifiedBy): void
+    {
+        $ticket->setDateModified(new DateTime('now'));
+        // TODO add property to entity
+        // $ticket->setModifiedBy($currentUser);
+        $this->entityManager->persist($ticket);
+        $this->entityManager->flush();
     }
 }
