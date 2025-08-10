@@ -19,19 +19,6 @@ readonly class TicketService
 
     public function createTicket(array $data): ?Ticket
     {
-        $validKeys = [
-            'assigned_user',
-            'assigned_group',
-            'closed_by',
-            'date_due',
-            'original_message',
-            'requesting_user',
-            'resolved_user',
-            'subject'
-        ];
-
-        // TODO validate input, does it have to be here?
-
         try {
             $ticket = new Ticket();
             $ticket->setDateCreated(new DateTimeImmutable('now'))
