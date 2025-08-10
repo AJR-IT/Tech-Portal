@@ -8,7 +8,7 @@ use Symfony\Component\Filesystem\Filesystem;
 
 class InstallControllerTest extends KernelTestCase
 {
-    public function testLockInstaller()
+    public function testLockInstaller(): void
     {
         self::bootKernel();
         $container = self::getContainer();

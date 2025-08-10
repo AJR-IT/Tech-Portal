@@ -1,0 +1,31 @@
+#!/usr/bin/env php
+<?php declare(strict_types=1);
+
+main($argv);
+function main($argv): void
+{
+    if (count($argv) < 2) {
+        echo 'Usage: php bin/techportal <command> [args..]' . PHP_EOL;
+        echo 'Available commands: dev_setup' . PHP_EOL;
+        exit(1);
+    }
+
+    $command = $argv[1];
+
+    switch ($command) {
+        case 'dev_setup':
+            run('php bin/console --env=test doctrine:database:create --no-interaction');
+            run('php bin/console --env=test doctrine:schema:create --no-interaction');
+            run('php bin/console --env=test doctrine:fixtures:load --no-interaction');
+    }
+}
+
+function run(string $cmd): void
+{
+    echo ">>> Running {$cmd}";
+    passthru($cmd, $exitCode);
+    if ($exitCode !== 0) {
+        echo "Command failed with exit code {$exitCode}\n";
+        exit($exitCode);
+    }
+}
