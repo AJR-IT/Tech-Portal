@@ -70,20 +70,33 @@ readonly class TicketService
         return $ticket;
     }
 
-    public function updateTicket(Ticket $ticket, User $currentUser): Ticket
+    public function updateTicket(Ticket $ticket, User $updatedBy): Ticket
     {
         $ticket->setDateModified(new DateTime('now'));
         // TODO add property to entity
-        // $ticket->setModifiedBy($currentUser);
+        // $ticket->setModifiedBy($updatedBy);
         $this->entityManager->persist($ticket);
         $this->entityManager->flush();
 
         return $ticket;
     }
 
-    public function deleteTicket(Ticket $ticket): void {}
+    public function deleteTicket(Ticket $ticket): void
+    {
+        $this->entityManager->remove($ticket);
+        $this->entityManager->flush();
+    }
 
-    public function closeTicket(Ticket $ticket): void {}
+    public function closeTicket(Ticket $ticket, User $closedBy): Ticket
+    {
+        $ticket->setClosedBy($closedBy);
 
-    public function archiveTicket(Ticket $ticket): void {}
+        $ticket->setClosedDate(new DateTimeImmutable('now'));
+
+        $this->entityManager->persist($ticket);
+
+        $this->entityManager->flush();
+
+        return $ticket;
+    }
 }

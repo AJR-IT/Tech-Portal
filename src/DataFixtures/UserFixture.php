@@ -11,12 +11,19 @@ class UserFixture extends Fixture
 {
     public function load(ObjectManager $manager): void
     {
-        $user = new User();
-        $user->setUsername('test');
-        $user->setPassword('test');
-        $user->setEmail('test@local.com');
-        $user->setDateCreated(new DateTimeImmutable());
-        $manager->persist($user);
+        $users = [
+           ['username' => 'testRequester', 'password' => 'test', 'email' => 'testRequester@local.com'],
+           ['username' => 'testTechnician', 'password' => 'test', 'email' => 'testTechnician@local.com']
+        ];
+
+        foreach ($users as $user) {
+            $entity = new User();
+            $entity->setUsername($user['username']);
+            $entity->setPassword($user['password']);
+            $entity->setEmail($user['email']);
+            $entity->setDateCreated(new DateTimeImmutable());
+            $manager->persist($entity);
+        }
 
         $manager->flush();
     }
