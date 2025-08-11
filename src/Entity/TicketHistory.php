@@ -27,6 +27,9 @@ class TicketHistory
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $message = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $subject = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -76,6 +79,18 @@ class TicketHistory
     public function setMessage(?string $message): static
     {
         $this->message = $message;
+
+        return $this;
+    }
+
+    public function getSubject(): ?string
+    {
+        return $this->subject;
+    }
+
+    public function setSubject(?string $subject): static
+    {
+        $this->subject = $subject;
 
         return $this;
     }

@@ -2,18 +2,22 @@
 
 namespace App\Tests\Service;
 
+use App\Entity\Status;
 use App\Entity\Ticket;
 use App\Entity\TicketHistory;
 use App\Entity\User;
+use App\Repository\StatusRepository;
 use App\Repository\UserRepository;
 use App\Service\TicketService;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Exception\ORMException;
+use InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class TicketServiceTest extends KernelTestCase
 {
     private TicketService $ticketService;
+    private StatusRepository $statusRepository;
+
     private User $testRequestUser;
     private User $testTechnicianUser;
     private array $testTicketData;
@@ -28,6 +32,8 @@ class TicketServiceTest extends KernelTestCase
         $this->entityManager = $container->get('doctrine')->getManager();
 
         $this->ticketService = $container->get(TicketService::class);
+
+        $this->statusRepository = $container->get(StatusRepository::class);
 
         $userRepository = $container->get(UserRepository::class);
 
@@ -79,6 +85,8 @@ class TicketServiceTest extends KernelTestCase
         $this->assertEquals('testRequester', $ticket->getRequestingUser()->getUsername(), 'Requesting user should be \'testRequester\'.');
 
         $this->assertInstanceOf(TicketHistory::class, $ticket->getTicketHistory()[0], 'Ticket history should be created on ticket creation.');
+
+        $this->assertEquals('Open', $ticket->getStatus()->getFriendlyName(), 'Status should be \'Open\'.');
     }
 
     public function testUpdateTicket(): void
@@ -95,7 +103,7 @@ class TicketServiceTest extends KernelTestCase
 
         $this->assertNotEquals($previousDateTime, $ticket->getDateModified(), 'Tickets modified date should be different than it previously was set as.');
 
-        $this->assertEquals('Ticket Updated', $ticket->getTicketHistory()[1]->getMessage(), 'Second ticket history item should be \'Ticket Updated\'.');
+        $this->assertEquals('Ticket Updated', $ticket->getTicketHistory()[1]->getSubject(), 'Second ticket history item should be \'Ticket Updated\'.');
     }
 
     public function testCloseTicket(): void
@@ -110,10 +118,27 @@ class TicketServiceTest extends KernelTestCase
 
         $this->assertEquals('testTechnician', $ticket->getClosedBy()->getUsername(), 'Ticket should have a closed by User set.');
 
-        $this->assertEquals('Ticket Closed', $ticket->getTicketHistory()[1]->getMessage(), 'Second ticket history item should be \'Ticket Closed\'.');
+        $this->assertEquals('Ticket Closed', $ticket->getTicketHistory()[1]->getSubject(), 'Second ticket history item should be \'Ticket Closed\'.');
+
+        $this->assertEquals('Closed', $ticket->getStatus()->getFriendlyName(), 'Status should be \'Closed\'.');
     }
 
-    public function testCloseTickets(): void
+    public function testCloseTicketsByEntity(): void
+    {
+        for ($i=0; $i < 5; $i++) {
+            $this->ticketService->createTicket($this->testTicketData);
+        }
+
+        $tickets = $this->entityManager->getRepository(Ticket::class)->findAll();
+
+        $ticketsByEntity = $this->ticketService->closeTickets($tickets, $this->testTechnicianUser);
+
+        foreach ($ticketsByEntity as $ticket) {
+            $this->assertEquals('testTechnician', $ticket->getClosedBy()->getUsername(), 'Ticket closed by Ticket::class should have a closed by User set.');
+        }
+    }
+
+    public function testCloseTicketsById(): void
     {
         for ($i=0; $i < 5; $i++) {
             $this->ticketService->createTicket($this->testTicketData);
@@ -122,20 +147,18 @@ class TicketServiceTest extends KernelTestCase
         $tickets = $this->entityManager->getRepository(Ticket::class)->findAll();
 
         $ids = [];
+
         foreach ($tickets as $ticket) {
             $ids[] = $ticket->getId();
         }
 
-        $this->ticketService->closeTickets($tickets, $this->testTechnicianUser);
+        $this->ticketService->closeTickets($ids, $this->testTechnicianUser);
 
-        foreach ($tickets as $ticket) {
-            $this->assertEquals('testTechnician', $ticket->getClosedBy()->getUsername(), 'Ticket closed by Ticket::class should have a closed by User set.');
-        }
+        $ticketsById = $this->ticketService->getTickets();
 
-        $this->ticketService->closeTickets($ids, $this->testRequestUser);
-
-        foreach ($tickets as $ticket) {
-            $this->assertEquals('testRequester', $ticket->getClosedBy()->getUsername(), 'Ticket closed by id should have a closed by User set.');
+        foreach ($ticketsById as $ticket) {
+            $this->assertEquals('testTechnician', $ticket->getClosedBy()->getUsername(), 'Ticket closed by id should have a closed by User set.');
+            $this->assertInstanceOf(Ticket::class, $ticket);
         }
     }
 
@@ -153,7 +176,6 @@ class TicketServiceTest extends KernelTestCase
     public function testResolvedTicket(): void
     {
         $ticket = $this->ticketService->createTicket($this->testTicketData);
-        $this->assertTrue(true);
 
         $this->assertNull($ticket->getResolvedDate(), 'Ticket should not have a resolved date set.');
 
@@ -165,7 +187,18 @@ class TicketServiceTest extends KernelTestCase
 
         $this->assertEquals('testTechnician', $ticket->getResolvedBy()->getUsername(), 'Ticket should have a resolved by User set.');
 
-        $this->assertEquals('Ticket Resolved', $ticket->getTicketHistory()[1]->getMessage(), 'Second ticket history item should be \'Ticket Resolved\'.');
+        $this->assertEquals('Ticket Resolved', $ticket->getTicketHistory()[1]->getSubject(), 'Second ticket history item should be \'Ticket Resolved\'.');
+
+        $this->assertEquals('Resolved', $ticket->getStatus()->getFriendlyName(), 'Status should be \'Resolved\'.');
+    }
+
+    public function testCancelledTicket(): void
+    {
+        $ticket = $this->ticketService->createTicket($this->testTicketData);
+
+        $ticket = $this->ticketService->cancelTicket($ticket, $this->testTechnicianUser);
+
+        $this->assertEquals('testTechnician', $ticket->getCancelledBy()->getUsername(), 'Ticket cancelled by User set.');
     }
 
     public function testGetTicket(): void
@@ -177,6 +210,15 @@ class TicketServiceTest extends KernelTestCase
         $this->assertInstanceof(Ticket::class, $this->ticketService->getTicket($ticket->getId()), 'Ticket found by ID should be an instance of Ticket');
     }
 
+    public function testFailGetTicket(): void
+    {
+        $this->ticketService->createTicket($this->testTicketData);
+
+        $this->expectException(InvalidArgumentException::class);
+
+        $this->ticketService->getTicket(null, []);
+    }
+
     public function testGetTicketWhereClosed(): void
     {
         $ticket = $this->ticketService->createTicket($this->testTicketData);
@@ -184,6 +226,15 @@ class TicketServiceTest extends KernelTestCase
         $this->ticketService->closeTicket($ticket, $this->testTechnicianUser);
 
         $this->assertInstanceOf(Ticket::class, $this->ticketService->getTicket(filter: ['closedBy' => $this->testTechnicianUser]));
+    }
+
+    public function testGetTicketWhereResolved(): void
+    {
+        $ticket = $this->ticketService->createTicket($this->testTicketData);
+
+        $this->ticketService->resolveTicket($ticket, $this->testTechnicianUser);
+
+        $this->assertInstanceOf(Ticket::class, $this->ticketService->getTicket(filter: ['resolvedBy' => $this->testTechnicianUser]));
     }
 
     public function testGetTickets(): void
@@ -206,5 +257,30 @@ class TicketServiceTest extends KernelTestCase
         $this->ticketService->closeTickets($tickets, $this->testTechnicianUser);
 
         $this->assertCount(5, $this->ticketService->getTickets(['closedBy' => $this->testTechnicianUser]), 'Ticket count should be 5.');
+    }
+
+    public function testGetTicketsWhereResolved(): void
+    {
+        for ($i=0; $i < 10; $i++) {
+            $this->ticketService->createTicket($this->testTicketData);
+        }
+
+        $tickets = $this->entityManager->getRepository(Ticket::class)->findBy([], limit: 5);
+
+        $this->ticketService->resolveTickets($tickets, $this->testTechnicianUser);
+
+        $this->assertCount(5, $this->ticketService->getTickets(['resolvedBy' => $this->testTechnicianUser]), 'Ticket count should be 5.');
+    }
+
+    public function testChangeStatus(): void
+    {
+        $ticket = $this->ticketService->createTicket($this->testTicketData);
+
+        /** @var Status $closedStatus */
+        $closedStatus = $this->statusRepository->findOneBy(['friendlyName' => 'Closed']);
+
+        $this->ticketService->changeStatus($ticket, $closedStatus, $this->testTechnicianUser);
+
+        $this->assertEquals('Closed', $ticket->getStatus()->getFriendlyName(), 'Ticket status should be Closed.');
     }
 }

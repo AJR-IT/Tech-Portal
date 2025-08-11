@@ -29,13 +29,6 @@ final class TicketController extends AbstractController
         ]);
     }
 
-    /**
-     * Create a new ticket
-     * @param array{assigned_user: User, assigned_group: UserGroup, closed_by: User, date_due: DateTimeImmutable, original_message: string, requesting_user: User, resolved_user: User, subject: string} $data
-     * @param User $currentUser
-     *
-     * @return void
-     */
     #[Route('/new', name: 'new')]
     public function createTicket(array $data, #[CurrentUser] User $currentUser): void
     {

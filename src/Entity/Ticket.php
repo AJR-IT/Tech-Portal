@@ -20,10 +20,10 @@ class Ticket
     private ?\DateTimeImmutable $dateCreated = null;
 
     #[ORM\Column(nullable: true)]
-    private ?\DateTime $dateModified = null;
+    private ?\DateTimeImmutable $dateModified = null;
 
     #[ORM\Column(nullable: true)]
-    private ?\DateTime $dateDue = null;
+    private ?\DateTimeImmutable $dateDue = null;
 
     #[ORM\Column(length: 255)]
     private ?string $subject = null;
@@ -70,6 +70,19 @@ class Ticket
     #[ORM\OneToMany(targetEntity: TicketHistory::class, mappedBy: 'ticket', orphanRemoval: true)]
     private Collection $ticketHistory;
 
+    #[ORM\ManyToOne(inversedBy: 'tickets')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Status $status;
+
+    #[ORM\ManyToOne]
+    private ?User $modifiedBy = null;
+
+    #[ORM\ManyToOne]
+    private ?User $cancelledBy = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $cancelledDate = null;
+
     public function __construct()
     {
         $this->comments = new ArrayCollection();
@@ -94,24 +107,24 @@ class Ticket
         return $this;
     }
 
-    public function getDateModified(): ?\DateTime
+    public function getDateModified(): ?\DateTimeImmutable
     {
         return $this->dateModified;
     }
 
-    public function setDateModified(?\DateTime $dateModified): static
+    public function setDateModified(?\DateTimeImmutable $dateModified): static
     {
         $this->dateModified = $dateModified;
 
         return $this;
     }
 
-    public function getDateDue(): ?\DateTime
+    public function getDateDue(): ?\DateTimeImmutable
     {
         return $this->dateDue;
     }
 
-    public function setDateDue(?\DateTime $dateDue): static
+    public function setDateDue(?\DateTimeImmutable $dateDue): static
     {
         $this->dateDue = $dateDue;
 
@@ -306,6 +319,54 @@ class Ticket
                 $ticketHistory->setTicket(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getStatus(): ?Status
+    {
+        return $this->status;
+    }
+
+    public function setStatus(?Status $status): static
+    {
+        $this->status = $status;
+
+        return $this;
+    }
+
+    public function getModifiedBy(): ?User
+    {
+        return $this->modifiedBy;
+    }
+
+    public function setModifiedBy(?User $modifiedBy): static
+    {
+        $this->modifiedBy = $modifiedBy;
+
+        return $this;
+    }
+
+    public function getCancelledBy(): ?User
+    {
+        return $this->cancelledBy;
+    }
+
+    public function setCancelledBy(?User $cancelledBy): static
+    {
+        $this->cancelledBy = $cancelledBy;
+
+        return $this;
+    }
+
+    public function getCancelledDate(): ?\DateTimeImmutable
+    {
+        return $this->cancelledDate;
+    }
+
+    public function setCancelledDate(?\DateTimeImmutable $cancelledDate): static
+    {
+        $this->cancelledDate = $cancelledDate;
 
         return $this;
     }
