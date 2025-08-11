@@ -348,6 +348,14 @@ final readonly class TicketService
         return $this->entityManager->getRepository(Ticket::class)->findBy($filter);
     }
 
+    /**
+     *
+     * @param Ticket $ticket
+     * @param User $relatedUser
+     * @param string $subject
+     * @param string|null $message
+     * @return TicketHistory
+     */
     protected function addTicketHistory(Ticket $ticket, User $relatedUser, string $subject, ?string $message = null): TicketHistory
     {
         $ticketHistory = new TicketHistory();
@@ -367,6 +375,10 @@ final readonly class TicketService
         return $ticketHistory;
     }
 
+    /**
+     * @param mixed $int
+     * @return bool
+     */
     protected function ensurePositiveInteger(mixed $int): bool
     {
         return filter_var($int, FILTER_VALIDATE_INT, ['options' => ['min_range' => 0]]);
