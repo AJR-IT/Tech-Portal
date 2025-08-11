@@ -35,20 +35,12 @@ readonly class TicketService
                 ->setSubject($data['subject'] ?? null)
             ;
 
-            $ticketHistory = new TicketHistory();
-
-            $ticketHistory
-                ->setTicket($ticket)
-                ->setDateCreated(new DateTimeImmutable('now'))
-                ->setRelatedUser($ticket->getRequestingUser())
-                ->setMessage(TicketAction::CREATED)
-            ;
-
-            $this->entityManager->persist($ticketHistory);
-
-            $ticket->addTicketHistory($ticketHistory);
-
             $this->entityManager->persist($ticket);
+
+            $ticket->addTicketHistory(
+                $this->addTicketHistory($ticket, $ticket->getREquestingUser(), TicketAction::CREATED)
+            );
+
             $this->entityManager->flush();
         } catch (Exception) {
             return null;
@@ -62,7 +54,13 @@ readonly class TicketService
         $ticket->setDateModified(new DateTime('now'));
         // TODO add property to entity
         // $ticket->setModifiedBy($updatedBy);
+
+        $ticket->addTicketHistory(
+            $this->addTicketHistory($ticket, $updatedBy, TicketAction::UPDATED)
+        );
+
         $this->entityManager->persist($ticket);
+
         $this->entityManager->flush();
 
         return $ticket;
@@ -80,10 +78,63 @@ readonly class TicketService
 
         $ticket->setClosedDate(new DateTimeImmutable('now'));
 
+        $ticket->addTicketHistory(
+            $this->addTicketHistory($ticket, $closedBy, TicketAction::CLOSED)
+        );
+
         $this->entityManager->persist($ticket);
 
         $this->entityManager->flush();
 
         return $ticket;
+    }
+
+    public function resolveTicket(Ticket $ticket, User $resolvedBy): Ticket
+    {
+        $ticket->setResolvedBy($resolvedBy);
+
+        $ticket->setResolvedDate(new DateTimeImmutable());
+
+        $ticket->addTicketHistory(
+            $this->addTicketHistory($ticket, $resolvedBy, TicketAction::RESOLVED)
+        );
+
+        $this->entityManager->persist($ticket);
+
+        $this->entityManager->flush();
+
+        return $ticket;
+    }
+
+    public function getTicket(int|Ticket $ticketId): ?Ticket
+    {
+        if ($ticketId instanceof Ticket) {
+            return $ticketId;
+        }
+
+        return $this->entityManager->getRepository(Ticket::class)->find($ticketId);
+    }
+
+    public function getTickets(): array
+    {
+        return $this->entityManager->getRepository(Ticket::class)->findAll();
+    }
+
+    private function addTicketHistory(Ticket $ticket, User $relatedUser, string $message): TicketHistory
+    {
+        $ticketHistory = new TicketHistory();
+
+        $ticketHistory
+            ->setTicket($ticket)
+            ->setDateCreated(new DateTimeImmutable('now'))
+            ->setRelatedUser($relatedUser)
+            ->setMessage($message)
+        ;
+
+        $this->entityManager->persist($ticketHistory);
+
+        $this->entityManager->flush();
+
+        return $ticketHistory;
     }
 }

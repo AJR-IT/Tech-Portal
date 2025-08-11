@@ -15,6 +15,10 @@ class TicketAction
 
     public const string RESOLVED = 'Ticket Resolved';
 
+    public const string UPDATED = 'Ticket Updated';
+
+    public const string COMMENTED = 'Ticket Commented';
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]

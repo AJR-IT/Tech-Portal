@@ -7,9 +7,6 @@ use App\Entity\TicketHistory;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use App\Service\TicketService;
-use Doctrine\DBAL\Exception;
-use Doctrine\DBAL\Platforms\MySQLPlatform;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Exception\ORMException;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -20,7 +17,7 @@ class TicketServiceTest extends KernelTestCase
     private User $testRequestUser;
     private User $testTechnicianUser;
     private array $testTicketData;
-    private EntityManager $entityManager;
+    private EntityManagerInterface $entityManager;
 
     protected function setUp(): void
     {
@@ -103,6 +100,8 @@ class TicketServiceTest extends KernelTestCase
         $this->assertEquals('testTechnician', $ticket->getAssignedUser()->getUsername(), 'Ticket should have an assigned technician User.');
 
         $this->assertNotEquals($previousDateTime, $ticket->getDateModified(), 'Tickets modified date should be different than it previously was set as.');
+
+        $this->assertEquals('Ticket Updated', $ticket->getTicketHistory()[1]->getMessage(), 'Second ticket history item should be \'Ticket Updated\'.');
     }
 
     public function testCloseTicket(): void
@@ -116,6 +115,8 @@ class TicketServiceTest extends KernelTestCase
         $this->assertNotNull($ticket->getClosedDate(), 'Ticket should have a closed date set.');
 
         $this->assertEquals('testTechnician', $ticket->getClosedBy()->getUsername(), 'Ticket should have a closed by User set.');
+
+        $this->assertEquals('Ticket Closed', $ticket->getTicketHistory()[1]->getMessage(), 'Second ticket history item should be \'Ticket Closed\'.');
     }
 
     public function testDeleteTicket(): void
@@ -127,5 +128,23 @@ class TicketServiceTest extends KernelTestCase
         $this->ticketService->deleteTicket($ticket);
 
         $this->assertCount(0, $this->entityManager->getRepository(Ticket::class)->findAll(), 'Ticket count should 0.');
+    }
+
+    public function testResolvedTicket(): void
+    {
+        $ticket = $this->ticketService->createTicket($this->testTicketData);
+        $this->assertTrue(true);
+
+        $this->assertNull($ticket->getResolvedDate(), 'Ticket should not have a resolved date set.');
+
+        $this->assertNull($ticket->getResolvedBy(), 'Ticket should not have a resolved by User.');
+
+        $this->ticketService->resolveTicket($ticket, $this->testTechnicianUser);
+
+        $this->assertInstanceOf(\DateTimeImmutable::class, $ticket->getResolvedDate(), 'Ticket should have a resolved date set.');
+
+        $this->assertEquals('testTechnician', $ticket->getResolvedBy()->getUsername(), 'Ticket should have a resolved by User set.');
+
+        $this->assertEquals('Ticket Resolved', $ticket->getTicketHistory()[1]->getMessage(), 'Second ticket history item should be \'Ticket Resolved\'.');
     }
 }
