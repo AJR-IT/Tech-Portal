@@ -47,9 +47,6 @@ class TicketServiceTest extends KernelTestCase
         ];
     }
 
-    /**
-     * @throws ORMException
-     */
     protected function tearDown(): void
     {
         $this->truncateEntities([
@@ -58,10 +55,7 @@ class TicketServiceTest extends KernelTestCase
         ]);
     }
 
-    /**
-     * @throws ORMException
-     */
-    private function truncateEntities(array $entities): void
+    protected function truncateEntities(array $entities): void
     {
         foreach ($entities as $entity) {
             $e = $this->entityManager->getRepository($entity);
@@ -119,6 +113,32 @@ class TicketServiceTest extends KernelTestCase
         $this->assertEquals('Ticket Closed', $ticket->getTicketHistory()[1]->getMessage(), 'Second ticket history item should be \'Ticket Closed\'.');
     }
 
+    public function testCloseTickets(): void
+    {
+        for ($i=0; $i < 5; $i++) {
+            $this->ticketService->createTicket($this->testTicketData);
+        }
+
+        $tickets = $this->entityManager->getRepository(Ticket::class)->findAll();
+
+        $ids = [];
+        foreach ($tickets as $ticket) {
+            $ids[] = $ticket->getId();
+        }
+
+        $this->ticketService->closeTickets($tickets, $this->testTechnicianUser);
+
+        foreach ($tickets as $ticket) {
+            $this->assertEquals('testTechnician', $ticket->getClosedBy()->getUsername(), 'Ticket closed by Ticket::class should have a closed by User set.');
+        }
+
+        $this->ticketService->closeTickets($ids, $this->testRequestUser);
+
+        foreach ($tickets as $ticket) {
+            $this->assertEquals('testRequester', $ticket->getClosedBy()->getUsername(), 'Ticket closed by id should have a closed by User set.');
+        }
+    }
+
     public function testDeleteTicket(): void
     {
         $ticket = $this->ticketService->createTicket($this->testTicketData);
@@ -146,5 +166,45 @@ class TicketServiceTest extends KernelTestCase
         $this->assertEquals('testTechnician', $ticket->getResolvedBy()->getUsername(), 'Ticket should have a resolved by User set.');
 
         $this->assertEquals('Ticket Resolved', $ticket->getTicketHistory()[1]->getMessage(), 'Second ticket history item should be \'Ticket Resolved\'.');
+    }
+
+    public function testGetTicket(): void
+    {
+        $ticket = $this->ticketService->createTicket($this->testTicketData);
+
+        $this->assertInstanceOf(Ticket::class, $this->ticketService->getTicket($ticket), 'Ticket found by Ticket::class should be an instance of Ticket');
+
+        $this->assertInstanceof(Ticket::class, $this->ticketService->getTicket($ticket->getId()), 'Ticket found by ID should be an instance of Ticket');
+    }
+
+    public function testGetTicketWhereClosed(): void
+    {
+        $ticket = $this->ticketService->createTicket($this->testTicketData);
+
+        $this->ticketService->closeTicket($ticket, $this->testTechnicianUser);
+
+        $this->assertInstanceOf(Ticket::class, $this->ticketService->getTicket(filter: ['closedBy' => $this->testTechnicianUser]));
+    }
+
+    public function testGetTickets(): void
+    {
+        for ($i=0; $i < 10; $i++) {
+            $this->ticketService->createTicket($this->testTicketData);
+        }
+
+        $this->assertCount(10, $this->ticketService->getTickets(), 'Ticket count should be 10.');
+    }
+
+    public function testGetTicketsWhereClosed(): void
+    {
+        for ($i=0; $i < 10; $i++) {
+            $this->ticketService->createTicket($this->testTicketData);
+        }
+
+        $tickets = $this->entityManager->getRepository(Ticket::class)->findBy([], limit: 5);
+
+        $this->ticketService->closeTickets($tickets, $this->testTechnicianUser);
+
+        $this->assertCount(5, $this->ticketService->getTickets(['closedBy' => $this->testTechnicianUser]), 'Ticket count should be 5.');
     }
 }

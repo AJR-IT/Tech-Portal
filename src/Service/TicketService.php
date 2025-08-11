@@ -55,11 +55,11 @@ readonly class TicketService
         // TODO add property to entity
         // $ticket->setModifiedBy($updatedBy);
 
+        $this->entityManager->persist($ticket);
+
         $ticket->addTicketHistory(
             $this->addTicketHistory($ticket, $updatedBy, TicketAction::UPDATED)
         );
-
-        $this->entityManager->persist($ticket);
 
         $this->entityManager->flush();
 
@@ -78,15 +78,29 @@ readonly class TicketService
 
         $ticket->setClosedDate(new DateTimeImmutable('now'));
 
+        $this->entityManager->persist($ticket);
+
         $ticket->addTicketHistory(
             $this->addTicketHistory($ticket, $closedBy, TicketAction::CLOSED)
         );
 
-        $this->entityManager->persist($ticket);
-
-        $this->entityManager->flush();
-
         return $ticket;
+    }
+
+    public function closeTickets(array $tickets, User $closedBy): array
+    {
+        foreach ($tickets as $ticket) {
+            if ($ticket instanceof Ticket) {
+                $this->closeTicket($ticket, $closedBy);
+            } elseif (is_int($ticket)) {
+                $this->closeTicket(
+                    $this->entityManager->getRepository(Ticket::class)->find($ticket),
+                    $closedBy
+                );
+            }
+        }
+
+        return $tickets;
     }
 
     public function resolveTicket(Ticket $ticket, User $resolvedBy): Ticket
@@ -95,29 +109,33 @@ readonly class TicketService
 
         $ticket->setResolvedDate(new DateTimeImmutable());
 
+        $this->entityManager->persist($ticket);
+
         $ticket->addTicketHistory(
             $this->addTicketHistory($ticket, $resolvedBy, TicketAction::RESOLVED)
         );
-
-        $this->entityManager->persist($ticket);
 
         $this->entityManager->flush();
 
         return $ticket;
     }
 
-    public function getTicket(int|Ticket $ticketId): ?Ticket
+    public function getTicket(int|Ticket|null $ticketId = null, array $filter = []): ?Ticket
     {
         if ($ticketId instanceof Ticket) {
             return $ticketId;
         }
 
-        return $this->entityManager->getRepository(Ticket::class)->find($ticketId);
+        if (is_int($ticketId)) {
+            $filter = ['id' => $ticketId];
+        }
+
+        return $this->entityManager->getRepository(Ticket::class)->findOneBy($filter);
     }
 
-    public function getTickets(): array
+    public function getTickets(array $filter = []): array
     {
-        return $this->entityManager->getRepository(Ticket::class)->findAll();
+        return $this->entityManager->getRepository(Ticket::class)->findBy($filter);
     }
 
     private function addTicketHistory(Ticket $ticket, User $relatedUser, string $message): TicketHistory
