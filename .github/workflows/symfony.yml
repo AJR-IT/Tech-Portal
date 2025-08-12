@@ -1,9 +1,11 @@
 name: Full CI process for Symfony 7
+
 on:
   push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
-env:
-  ES_HTTP_PORT: 9209
 jobs:
   symfony:
     name: Symfony 7 (PHP ${{ matrix.php-versions }})
