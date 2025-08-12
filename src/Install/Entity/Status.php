@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-
 namespace App\Install\Entity;
 
 use App\Entity\Status as StatusEntity;
@@ -54,10 +53,10 @@ final class Status implements InstallerEntityInterface
 
         foreach ($statuses as $status) {
             if (!in_array($status->getFullName(), $checkNames)) {
-                $errorCount++;
+                ++$errorCount;
             }
         }
 
-        return $errorCount === 0;
+        return 0 === $errorCount;
     }
 }

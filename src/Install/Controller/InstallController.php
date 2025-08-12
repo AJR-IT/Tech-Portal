@@ -5,15 +5,14 @@ declare(strict_types=1);
 namespace App\Install\Controller;
 
 use App\Entity\Config;
+use App\Entity\Status as StatusEntity;
+use App\Entity\Tag as TagEntity;
 use App\Entity\User as UserEntity;
 use App\Entity\UserGroup as UserGroupEntity;
-use App\Entity\Tag as TagEntity;
-use App\Entity\Status as StatusEntity;
 use App\Install\Entity\Status;
 use App\Install\Entity\Tag;
 use App\Install\Entity\TicketAction;
 use App\Install\Entity\UserGroup;
-use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Filesystem\Exception\IOException;
@@ -32,16 +31,12 @@ use Symfony\Component\Routing\Attribute\Route;
 class InstallController extends AbstractController
 {
     /**
-     * True if install process had an error
-     *
-     * @var bool
+     * True if install process had an error.
      */
     private bool $errorInstalling = false;
 
     /**
-     * Array of messages during installation process
-     *
-     * @var array
+     * Array of messages during installation process.
      */
     private array $messages = [];
 
@@ -52,10 +47,7 @@ class InstallController extends AbstractController
     }
 
     /**
-     * Landing page for installation
-     *
-     * @param Request $request
-     * @return Response
+     * Landing page for installation.
      */
     #[Route('/install', name: 'install_index')]
     public function index(Request $request): Response
@@ -79,7 +71,7 @@ class InstallController extends AbstractController
                 ->setUsername($data['username'])
                 ->setPassword($this->passwordHasher->hashPassword($user, $data['plainPassword']))
                 ->setCanLogIn(true)
-                ->setDateCreated(new DateTimeImmutable('now'))
+                ->setDateCreated(new \DateTimeImmutable('now'))
                 ->setFirstName($data['firstName'])
                 ->setLastName($data['lastName'])
                 ->setRoles(['ROLE_ADMIN'])
@@ -134,17 +126,15 @@ class InstallController extends AbstractController
     }
 
     /**
-     * Check if the 'install.lock' file exists
-     *
-     * @return bool
+     * Check if the 'install.lock' file exists.
      */
     public function verifyInstalled(): bool
     {
         $filesystem = new Filesystem();
 
-        $locked = $filesystem->exists(__DIR__ . '/../../../var/install.lock');
+        $locked = $filesystem->exists(__DIR__.'/../../../var/install.lock');
 
-        if ($locked === false) {
+        if (false === $locked) {
             return false;
         }
 
@@ -153,38 +143,34 @@ class InstallController extends AbstractController
         $this->messages[] = [
             'level' => 'info',
             'message' => 'Installation is already installed',
-            'fullMessage' => ''
+            'fullMessage' => '',
         ];
 
         return true;
     }
 
     /**
-     * Create the 'install.lock' file to lock the installer from running
-     *
-     * @return void
+     * Create the 'install.lock' file to lock the installer from running.
      */
     public function lockInstaller(): void
     {
         $filesystem = new Filesystem();
 
         try {
-            $filesystem->touch(__DIR__ . '/../../../var/install.lock');
+            $filesystem->touch(__DIR__.'/../../../var/install.lock');
         } catch (IOException $e) {
             $this->errorInstalling = true;
 
             $this->messages[] = [
                 'level' => 'danger',
                 'message' => 'Unable to create lock file',
-                'fullMessage' => $e->getMessage()
+                'fullMessage' => $e->getMessage(),
             ];
         }
     }
 
     /**
-     * Creates the installation form
-     *
-     * @return FormInterface
+     * Creates the installation form.
      */
     private function setUpInstallationForm(): FormInterface
     {
@@ -278,50 +264,46 @@ class InstallController extends AbstractController
                 'label' => 'Install',
                 'attr' => [
                     'class' => 'btn btn-primary',
-                ]
+                ],
             ])
             ->getForm()
         ;
     }
 
     /**
-     * Calls the Status install class to create the default statuses
-     *
-     * @return void
+     * Calls the Status install class to create the default statuses.
      */
     private function setStatus(): void
     {
         $status = new Status($this->entityManager);
         $status->initialize();
 
-        if ($status->verify() === false) {
+        if (false === $status->verify()) {
             $this->errorInstalling = true;
 
             $this->messages[] = [
                 'level' => 'danger',
                 'message' => 'Failed to create statuses',
-                'fullMessage' => ''
+                'fullMessage' => '',
             ];
         }
     }
 
     /**
-     * Calls the Tag install class to create the default tags
-     *
-     * @return void
+     * Calls the Tag install class to create the default tags.
      */
     private function setTag(): void
     {
         $tag = new Tag($this->entityManager);
         $tag->initialize();
 
-        if ($tag->verify() === false) {
+        if (false === $tag->verify()) {
             $this->errorInstalling = true;
 
             $this->messages[] = [
                 'level' => 'danger',
                 'message' => 'Failed to create tags',
-                'fullMessage' => ''
+                'fullMessage' => '',
             ];
         }
     }
@@ -331,34 +313,32 @@ class InstallController extends AbstractController
         $action = new TicketAction($this->entityManager);
         $action->initialize();
 
-        if ($action->verify() === false) {
+        if (false === $action->verify()) {
             $this->errorInstalling = true;
 
             $this->messages[] = [
                 'level' => 'danger',
                 'message' => 'Failed to create ticket actions',
-                'fullMessage' => ''
+                'fullMessage' => '',
             ];
         }
     }
 
     /**
-     * Calls the UserGroup install class to create the default group
-     *
-     * @return void
+     * Calls the UserGroup install class to create the default group.
      */
     private function setUserGroup(): void
     {
         $userGroup = new UserGroup($this->entityManager);
         $userGroup->initialize();
 
-        if ($userGroup->verify() === false) {
+        if (false === $userGroup->verify()) {
             $this->errorInstalling = true;
 
             $this->messages[] = [
                 'level' => 'danger',
                 'message' => 'Failed to create user groups',
-                'fullMessage' => ''
+                'fullMessage' => '',
             ];
         }
     }

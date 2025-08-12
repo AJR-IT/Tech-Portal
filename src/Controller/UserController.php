@@ -30,6 +30,5 @@ final class UserController extends AbstractController
     #[Route('/profile/update', name: 'profile_update')]
     public function userProfileUpdate(): void
     {
-
     }
 }

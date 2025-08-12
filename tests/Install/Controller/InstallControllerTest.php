@@ -17,7 +17,7 @@ class InstallControllerTest extends KernelTestCase
 
         $installController->lockInstaller();
 
-        $this->assertFileExists(__DIR__ . '/../../../var/install.lock');
+        $this->assertFileExists(__DIR__.'/../../../var/install.lock');
 
         $this->removeLockFile();
     }
@@ -45,8 +45,8 @@ class InstallControllerTest extends KernelTestCase
     private function removeLockFile()
     {
         $filesystem = new Filesystem();
-        if ($filesystem->exists(__DIR__ . '/../../../var/install.lock')) {
-            $filesystem->remove(__DIR__ . '/../../../var/install.lock');
+        if ($filesystem->exists(__DIR__.'/../../../var/install.lock')) {
+            $filesystem->remove(__DIR__.'/../../../var/install.lock');
         }
     }
 }

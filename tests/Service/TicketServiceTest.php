@@ -10,7 +10,6 @@ use App\Repository\StatusRepository;
 use App\Repository\UserRepository;
 use App\Service\TicketService;
 use Doctrine\ORM\EntityManagerInterface;
-use InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class TicketServiceTest extends KernelTestCase
@@ -49,7 +48,7 @@ class TicketServiceTest extends KernelTestCase
             'original_message' => 'This is a test message',
             'requesting_user' => $this->testRequestUser,
             'resolved_user' => null,
-            'subject' => 'This is a test subject'
+            'subject' => 'This is a test subject',
         ];
     }
 
@@ -125,7 +124,7 @@ class TicketServiceTest extends KernelTestCase
 
     public function testCloseTicketsByEntity(): void
     {
-        for ($i=0; $i < 5; $i++) {
+        for ($i = 0; $i < 5; ++$i) {
             $this->ticketService->createTicket($this->testTicketData);
         }
 
@@ -140,7 +139,7 @@ class TicketServiceTest extends KernelTestCase
 
     public function testCloseTicketsById(): void
     {
-        for ($i=0; $i < 5; $i++) {
+        for ($i = 0; $i < 5; ++$i) {
             $this->ticketService->createTicket($this->testTicketData);
         }
 
@@ -214,7 +213,7 @@ class TicketServiceTest extends KernelTestCase
     {
         $this->ticketService->createTicket($this->testTicketData);
 
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
 
         $this->ticketService->getTicket(null, []);
     }
@@ -239,7 +238,7 @@ class TicketServiceTest extends KernelTestCase
 
     public function testGetTickets(): void
     {
-        for ($i=0; $i < 10; $i++) {
+        for ($i = 0; $i < 10; ++$i) {
             $this->ticketService->createTicket($this->testTicketData);
         }
 
@@ -248,7 +247,7 @@ class TicketServiceTest extends KernelTestCase
 
     public function testGetTicketsWhereClosed(): void
     {
-        for ($i=0; $i < 10; $i++) {
+        for ($i = 0; $i < 10; ++$i) {
             $this->ticketService->createTicket($this->testTicketData);
         }
 
@@ -261,7 +260,7 @@ class TicketServiceTest extends KernelTestCase
 
     public function testGetTicketsWhereResolved(): void
     {
-        for ($i=0; $i < 10; $i++) {
+        for ($i = 0; $i < 10; ++$i) {
             $this->ticketService->createTicket($this->testTicketData);
         }
 

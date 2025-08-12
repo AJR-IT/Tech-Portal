@@ -13,12 +13,12 @@ class InstallationLockedSubscriber implements EventSubscriberInterface
     {
         $filesystem = new Filesystem();
 
-        if (!$filesystem->exists(__DIR__ . '/../../var/install.lock')) {
-            if ($event->getRequest()->getrequestUri() !== '/install') {
+        if (!$filesystem->exists(__DIR__.'/../../var/install.lock')) {
+            if ('/install' !== $event->getRequest()->getrequestUri()) {
                 $event->setResponse(
                     new Response(sprintf(
-                'Installation has not been run. Please navigate to the <a href="%s">installer</a>.',
-                $event->getRequest()->getSchemeAndHttpHost() . '/install')
+                        'Installation has not been run. Please navigate to the <a href="%s">installer</a>.',
+                        $event->getRequest()->getSchemeAndHttpHost().'/install')
                     )
                 );
             }
