@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Install\Entity;
 
 use App\Entity\UserGroup as UserGroupEntity;
-use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 
 final readonly class UserGroup implements InstallerEntityInterface
@@ -18,7 +17,7 @@ final readonly class UserGroup implements InstallerEntityInterface
     public function initialize(): void
     {
         $userGroup = new UserGroupEntity();
-        $userGroup->setDateCreated(new DateTimeImmutable('now'))
+        $userGroup->setDateCreated(new \DateTimeImmutable('now'))
             ->setAssignable(true)
             ->setName('Default Group')
             ->setDescription('System defined default group')
@@ -32,6 +31,6 @@ final readonly class UserGroup implements InstallerEntityInterface
     {
         $userGroup = $this->entityManager->getRepository(UserGroupEntity::class)->findOneBy(['name' => 'Default Group']);
 
-        return $userGroup !== null;
+        return null !== $userGroup;
     }
 }

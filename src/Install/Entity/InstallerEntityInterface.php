@@ -2,15 +2,12 @@
 
 declare(strict_types=1);
 
-
 namespace App\Install\Entity;
 
 interface InstallerEntityInterface
 {
     /**
-     * Initialize entity data
-     *
-     * @return void
+     * Initialize entity data.
      */
     public function initialize(): void;
 

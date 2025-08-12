@@ -9,10 +9,7 @@ use App\Entity\TicketHistory;
 use App\Entity\User;
 use App\Entity\UserGroup;
 use App\Repository\StatusRepository;
-use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
-use Exception;
-use InvalidArgumentException;
 
 final readonly class TicketService
 {
@@ -21,9 +18,9 @@ final readonly class TicketService
     }
 
     /**
-     * Create a new ticket
+     * Create a new ticket.
      *
-     * @param array{assigned_user: User, assigned_group: UserGroup, closed_by: User, date_due: DateTimeImmutable, original_message: string, requesting_user: User, resolved_user: User, subject: string} $data
+     * @param array{assigned_user: User, assigned_group: UserGroup, closed_by: User, date_due: \DateTimeImmutable, original_message: string, requesting_user: User, resolved_user: User, subject: string} $data
      *
      * @return Ticket|null Will return the Ticket::class entity or null on failure
      */
@@ -36,17 +33,17 @@ final readonly class TicketService
 
         try {
             $ticket
-                ->setDateCreated(new DateTimeImmutable('now'))
+                ->setDateCreated(new \DateTimeImmutable('now'))
                 ->setAssignedGroup($data['assigned_group'] ?? null)
                 ->setAssignedUser($data['assigned_user'] ?? null)
                 ->setClosedBy($data['closed_by'] ?? null)
-                ->setClosedDate((!is_null($data['closed_by'])) ? new DateTimeImmutable('now') : null)
+                ->setClosedDate((!is_null($data['closed_by'])) ? new \DateTimeImmutable('now') : null)
                 ->setDateDue($data['date_due'] ?? null)
-                ->setDateModified(new DateTimeImmutable('now'))
+                ->setDateModified(new \DateTimeImmutable('now'))
                 ->setOriginalMessage($data['original_message'] ?? null)
                 ->setRequestingUser($data['requesting_user'] ?? null)
                 ->setResolvedBy($data['resolved_user'] ?? null)
-                ->setResolvedDate((!is_null($data['resolved_user'])) ? new DateTimeImmutable('now') : null)
+                ->setResolvedDate((!is_null($data['resolved_user'])) ? new \DateTimeImmutable('now') : null)
                 ->setSubject($data['subject'] ?? null)
                 ->setStatus($status)
             ;
@@ -58,7 +55,7 @@ final readonly class TicketService
             );
 
             $this->entityManager->flush();
-        } catch (Exception) {
+        } catch (\Exception) {
             return null;
         }
 
@@ -66,10 +63,10 @@ final readonly class TicketService
     }
 
     /**
-     * Update a ticket
+     * Update a ticket.
      *
-     * @param Ticket $ticket The Ticket::class entity to be updated
-     * @param User $updatedBy The User::class that called the update
+     * @param Ticket $ticket    The Ticket::class entity to be updated
+     * @param User   $updatedBy The User::class that called the update
      *
      * @return Ticket|null The Ticket::class entity that was updated or null on failure
      */
@@ -78,7 +75,7 @@ final readonly class TicketService
         $previousTicket = $this->entityManager->getRepository(Ticket::class)->find($ticket->getId());
 
         try {
-            $ticket->setDateModified(new DateTimeImmutable('now'));
+            $ticket->setDateModified(new \DateTimeImmutable('now'));
 
             $ticket->setModifiedBy($updatedBy);
 
@@ -99,7 +96,7 @@ final readonly class TicketService
             }
 
             $this->entityManager->flush();
-        } catch (Exception) {
+        } catch (\Exception) {
             return null;
         }
 
@@ -107,11 +104,9 @@ final readonly class TicketService
     }
 
     /**
-     * Delete a ticket
+     * Delete a ticket.
      *
      * @param Ticket $ticket The Ticket::class entity to be removed
-     *
-     * @return void
      */
     public function deleteTicket(Ticket $ticket): void
     {
@@ -121,18 +116,18 @@ final readonly class TicketService
     }
 
     /**
-     * Change status of ticket
+     * Change status of ticket.
      *
-     * @param Ticket $ticket The Ticket::class entity to be updated
-     * @param Status $status The Status::class entity to set
-     * @param User $updatedBy The User::class entity that called the update
+     * @param Ticket $ticket    The Ticket::class entity to be updated
+     * @param Status $status    The Status::class entity to set
+     * @param User   $updatedBy The User::class entity that called the update
      *
      * @return Ticket|null The Ticket::class entity or null failure
      */
     public function changeStatus(Ticket $ticket, Status $status, User $updatedBy): ?Ticket
     {
         try {
-            $ticket->setDateModified(new DateTimeImmutable('now'));
+            $ticket->setDateModified(new \DateTimeImmutable('now'));
 
             $ticket->setStatus($status);
 
@@ -143,7 +138,7 @@ final readonly class TicketService
             $ticket->addTicketHistory(
                 $this->addTicketHistory($ticket, $updatedBy, TicketAction::UPDATED, 'Changed status')
             );
-        } catch (Exception) {
+        } catch (\Exception) {
             return null;
         }
 
@@ -151,10 +146,10 @@ final readonly class TicketService
     }
 
     /**
-     * Close a ticket
+     * Close a ticket.
      *
-     * @param Ticket $ticket The Ticket::class entity to close
-     * @param User $closedBy The User::class entity that called the close
+     * @param Ticket $ticket   The Ticket::class entity to close
+     * @param User   $closedBy The User::class entity that called the close
      *
      * @return Ticket The Ticket::class that was closed
      */
@@ -162,7 +157,7 @@ final readonly class TicketService
     {
         $ticket->setClosedBy($closedBy);
 
-        $ticket->setClosedDate(new DateTimeImmutable('now'));
+        $ticket->setClosedDate(new \DateTimeImmutable('now'));
 
         $this->entityManager->persist($ticket);
 
@@ -176,10 +171,10 @@ final readonly class TicketService
     }
 
     /**
-     * Close multiple tickets
+     * Close multiple tickets.
      *
-     * @param (Ticket|int)[] $tickets An array Ticket::class or int
-     * @param User $closedBy The User::class that called the close
+     * @param (Ticket|int)[] $tickets  An array Ticket::class or int
+     * @param User           $closedBy The User::class that called the close
      *
      * @return Ticket[] An array of Ticket::class entities
      */
@@ -200,10 +195,10 @@ final readonly class TicketService
     }
 
     /**
-     * Resolve a ticket
+     * Resolve a ticket.
      *
-     * @param Ticket $ticket The Ticket:class entity to be resolved
-     * @param User $resolvedBy The User::class that called the resolved
+     * @param Ticket $ticket     The Ticket:class entity to be resolved
+     * @param User   $resolvedBy The User::class that called the resolved
      *
      * @return Ticket The Ticket::entity that was resolved
      */
@@ -211,7 +206,7 @@ final readonly class TicketService
     {
         $ticket->setResolvedBy($resolvedBy);
 
-        $ticket->setResolvedDate(new DateTimeImmutable());
+        $ticket->setResolvedDate(new \DateTimeImmutable());
 
         $this->entityManager->persist($ticket);
 
@@ -227,10 +222,10 @@ final readonly class TicketService
     }
 
     /**
-     * Resolve multiple tickets
+     * Resolve multiple tickets.
      *
-     * @param (Ticket|int)[] $tickets An array of Ticket::class or int to be resolved
-     * @param User $resolvedBy The User::class that called the resolve
+     * @param (Ticket|int)[] $tickets    An array of Ticket::class or int to be resolved
+     * @param User           $resolvedBy The User::class that called the resolve
      *
      * @return (Ticket|int)[] An array of either Ticket::class or ticket ids, whichever was provided to the method
      */
@@ -251,10 +246,10 @@ final readonly class TicketService
     }
 
     /**
-     * Cancel a ticket
+     * Cancel a ticket.
      *
-     * @param Ticket $ticket The Ticket:class entity to be resolved
-     * @param User $cancelledBy The User::class that called the resolved
+     * @param Ticket $ticket      The Ticket:class entity to be resolved
+     * @param User   $cancelledBy The User::class that called the resolved
      *
      * @return Ticket The Ticket::entity that was resolved
      */
@@ -262,7 +257,7 @@ final readonly class TicketService
     {
         $ticket->setCancelledBy($cancelledBy);
 
-        $ticket->setCancelledDate(new DateTimeImmutable());
+        $ticket->setCancelledDate(new \DateTimeImmutable());
 
         $this->entityManager->persist($ticket);
 
@@ -278,10 +273,10 @@ final readonly class TicketService
     }
 
     /**
-     * Cancel multiple tickets
+     * Cancel multiple tickets.
      *
-     * @param (Ticket|int)[] $tickets An array of Ticket::class or int to be cancelled
-     * @param User $cancelledBy The User::class that called the cancellation
+     * @param (Ticket|int)[] $tickets     An array of Ticket::class or int to be cancelled
+     * @param User           $cancelledBy The User::class that called the cancellation
      *
      * @return (Ticket|int)[] An array of either Ticket::class or ticket ids, whichever was provided to the method
      */
@@ -302,19 +297,19 @@ final readonly class TicketService
     }
 
     /**
-     * Get a ticket
+     * Get a ticket.
      *
      * @param int|Ticket|null $ticketId The Ticket::class entity or an id of an entity. Provide null to use a custom filter
-     * @param array $filter Specify a filter array, default is an empty array ([])
-     *
-     * @throws InvalidArgumentException If you do not provide a $ticketId, you must provide a \$filter[]
+     * @param array           $filter   Specify a filter array, default is an empty array ([])
      *
      * @return Ticket|null The Ticket::class entity if found or null if not found
+     *
+     * @throws \InvalidArgumentException If you do not provide a $ticketId, you must provide a \$filter[]
      */
     public function getTicket(int|Ticket|null $ticketId = null, array $filter = []): ?Ticket
     {
         if (is_null($ticketId) && !$filter) {
-            throw new InvalidArgumentException('If you do not provide a $ticketId, you must provide a $filter[].');
+            throw new \InvalidArgumentException('If you do not provide a $ticketId, you must provide a $filter[].');
         }
 
         if ($ticketId instanceof Ticket) {
@@ -329,7 +324,7 @@ final readonly class TicketService
     }
 
     /**
-     * Get multiple tickets
+     * Get multiple tickets.
      *
      * @param array $filter Provide an array of filters
      *
@@ -337,11 +332,11 @@ final readonly class TicketService
      */
     public function getTickets(array $filter = []): array
     {
-        if ((count($filter) > 0) && $filter[0] instanceof Ticket) {
+        if ((count($filter) > 0) && $filter[array_rand($filter)] instanceof Ticket) {
             return $this->entityManager->getRepository(Ticket::class)->findByEntityArray($filter);
         }
 
-        if ((count($filter) > 0) && filter_var($filter[0], FILTER_VALIDATE_INT, ['options' => ['min_range' => 0]])) {
+        if ((count($filter) > 0) && $this->ensurePositiveInteger($filter[array_rand($filter)])) {
             return $this->entityManager->getRepository(Ticket::class)->findBy(['id' => $filter]);
         }
 
@@ -362,11 +357,10 @@ final readonly class TicketService
 
         $ticketHistory
             ->setTicket($ticket)
-            ->setDateCreated(new DateTimeImmutable('now'))
+            ->setDateCreated(new \DateTimeImmutable('now'))
             ->setRelatedUser($relatedUser)
             ->setSubject($subject)
             ->setMessage($message);
-        ;
 
         $this->entityManager->persist($ticketHistory);
 

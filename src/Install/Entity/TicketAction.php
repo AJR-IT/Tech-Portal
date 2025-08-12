@@ -43,6 +43,7 @@ final class TicketAction implements InstallerEntityInterface
 
         $this->entityManager->flush();
     }
+
     public function verify(): bool
     {
         $ticketActions = $this->entityManager->getRepository(TicketActionEntity::class)->findAll();
@@ -56,10 +57,10 @@ final class TicketAction implements InstallerEntityInterface
 
         foreach ($ticketActions as $ticketAction) {
             if (!in_array($ticketAction->getFullName(), $checkActions)) {
-                $errorCount++;
+                ++$errorCount;
             }
         }
 
-        return $errorCount === 0;
+        return 0 === $errorCount;
     }
 }

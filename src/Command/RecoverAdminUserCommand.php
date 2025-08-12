@@ -60,7 +60,7 @@ class RecoverAdminUserCommand extends Command
 
         $user = $this->userRepository->findOneBy(['username' => $username]);
 
-        if (! $user instanceof User) {
+        if (!$user instanceof User) {
             $user = new User();
             $user->setEmail($this->defaultCredenetials['email']);
             $user->setUsername($username);

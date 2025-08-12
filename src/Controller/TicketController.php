@@ -4,11 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Ticket;
 use App\Entity\User;
-use App\Entity\UserGroup;
 use App\Service\TicketService;
-use DateTime;
-use DateTimeImmutable;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -40,21 +36,15 @@ final class TicketController extends AbstractController
             'original_message',
             'requesting_user',
             'resolved_user',
-            'subject'
+            'subject',
         ];
     }
 
     /**
-     * Updates the provided ticket
-     *
-     * @param Ticket $ticket
-     * @param User $modifiedBy
-     *
-     * @return void
+     * Updates the provided ticket.
      */
     #[Route('/update', name: 'update')]
     public function updateTicket(Ticket $ticket, #[CurrentUser] User $modifiedBy): void
     {
-
     }
 }
