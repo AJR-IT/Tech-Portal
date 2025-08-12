@@ -78,10 +78,10 @@ class Ticket
     private ?User $modifiedBy = null;
 
     #[ORM\ManyToOne]
-    private ?User $cancelledBy = null;
+    private ?User $canceledBy = null;
 
     #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $cancelledDate = null;
+    private ?\DateTimeImmutable $canceledDate = null;
 
     public function __construct()
     {
@@ -347,26 +347,26 @@ class Ticket
         return $this;
     }
 
-    public function getCancelledBy(): ?User
+    public function getCanceledBy(): ?User
     {
-        return $this->cancelledBy;
+        return $this->canceledBy;
     }
 
-    public function setCancelledBy(?User $cancelledBy): static
+    public function setCanceledBy(?User $canceledBy): static
     {
-        $this->cancelledBy = $cancelledBy;
+        $this->canceledBy = $canceledBy;
 
         return $this;
     }
 
-    public function getCancelledDate(): ?\DateTimeImmutable
+    public function getCanceledDate(): ?\DateTimeImmutable
     {
-        return $this->cancelledDate;
+        return $this->canceledDate;
     }
 
-    public function setCancelledDate(?\DateTimeImmutable $cancelledDate): static
+    public function setCanceledDate(?\DateTimeImmutable $cancelledDate): static
     {
-        $this->cancelledDate = $cancelledDate;
+        $this->canceledDate = $cancelledDate;
 
         return $this;
     }

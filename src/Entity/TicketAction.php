@@ -17,7 +17,7 @@ class TicketAction
 
     public const string UPDATED = 'Ticket Updated';
 
-    public const string CANCELLED = 'Ticket Cancelled';
+    public const string CANCELED = 'Ticket Cancelled';
 
     public const string COMMENTED = 'Ticket Commented';
 

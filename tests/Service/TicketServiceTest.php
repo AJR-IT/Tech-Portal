@@ -191,13 +191,52 @@ class TicketServiceTest extends KernelTestCase
         $this->assertEquals('Resolved', $ticket->getStatus()->getFriendlyName(), 'Status should be \'Resolved\'.');
     }
 
-    public function testCancelledTicket(): void
+    public function testCanceledTicket(): void
     {
         $ticket = $this->ticketService->createTicket($this->testTicketData);
 
         $ticket = $this->ticketService->cancelTicket($ticket, $this->testTechnicianUser);
 
-        $this->assertEquals('testTechnician', $ticket->getCancelledBy()->getUsername(), 'Ticket cancelled by User set.');
+        $this->assertEquals('testTechnician', $ticket->getCanceledBy()->getUsername(), 'Ticket canceled by User set.');
+    }
+
+    public function testCanceledTicketsByEntity(): void
+    {
+        for ($i = 0; $i < 5; ++$i) {
+            $this->ticketService->createTicket($this->testTicketData);
+        }
+
+        $tickets = $this->entityManager->getRepository(Ticket::class)->findAll();
+
+        $ticketsByEntity = $this->ticketService->cancelTickets($tickets, $this->testTechnicianUser);
+
+        foreach ($ticketsByEntity as $ticket) {
+            $this->assertEquals('testTechnician', $ticket->getCanceledBy()->getUsername(), 'Ticket canceled by Ticket::class should have a canceled by User set.');
+        }
+    }
+
+    public function testCanceledTicketsById(): void
+    {
+        for ($i = 0; $i < 5; ++$i) {
+            $this->ticketService->createTicket($this->testTicketData);
+        }
+
+        $tickets = $this->entityManager->getRepository(Ticket::class)->findAll();
+
+        $ids = [];
+
+        foreach ($tickets as $ticket) {
+            $ids[] = $ticket->getId();
+        }
+
+        $this->ticketService->cancelTickets($ids, $this->testTechnicianUser);
+
+        $ticketsById = $this->ticketService->getTickets();
+
+        foreach ($ticketsById as $ticket) {
+            $this->assertEquals('testTechnician', $ticket->getCanceledBy()->getUsername(), 'Ticket canceled by id should have a canceled by User set.');
+            $this->assertInstanceOf(Ticket::class, $ticket);
+        }
     }
 
     public function testGetTicket(): void

@@ -116,7 +116,7 @@ final readonly class TicketService
     }
 
     /**
-     * Change status of ticket.
+     * Change status of a ticket.
      *
      * @param Ticket $ticket    The Ticket::class entity to be updated
      * @param Status $status    The Status::class entity to set
@@ -227,7 +227,7 @@ final readonly class TicketService
      * @param (Ticket|int)[] $tickets    An array of Ticket::class or int to be resolved
      * @param User           $resolvedBy The User::class that called the resolve
      *
-     * @return (Ticket|int)[] An array of either Ticket::class or ticket ids, whichever was provided to the method
+     * @return Ticket[] An array of Ticket::class entities
      */
     public function resolveTickets(array $tickets, User $resolvedBy): array
     {
@@ -248,26 +248,26 @@ final readonly class TicketService
     /**
      * Cancel a ticket.
      *
-     * @param Ticket $ticket      The Ticket:class entity to be resolved
-     * @param User   $cancelledBy The User::class that called the resolved
+     * @param Ticket $ticket     The Ticket:class entity to be resolved
+     * @param User   $canceledBy The User::class that called the resolved
      *
      * @return Ticket The Ticket::entity that was resolved
      */
-    public function cancelTicket(Ticket $ticket, User $cancelledBy): Ticket
+    public function cancelTicket(Ticket $ticket, User $canceledBy): Ticket
     {
-        $ticket->setCancelledBy($cancelledBy);
+        $ticket->setcanceledBy($canceledBy);
 
-        $ticket->setCancelledDate(new \DateTimeImmutable());
+        $ticket->setCanceledDate(new \DateTimeImmutable());
 
         $this->entityManager->persist($ticket);
 
         $ticket->addTicketHistory(
-            $this->addTicketHistory($ticket, $cancelledBy, TicketAction::CANCELLED)
+            $this->addTicketHistory($ticket, $canceledBy, TicketAction::CANCELED)
         );
 
         $this->entityManager->flush();
 
-        $this->changeStatus($ticket, $this->statusRepository->findOneBy(['fullName' => 'Cancelled']), $cancelledBy);
+        $this->changeStatus($ticket, $this->statusRepository->findOneBy(['fullName' => 'Canceled']), $canceledBy);
 
         return $ticket;
     }
@@ -275,25 +275,25 @@ final readonly class TicketService
     /**
      * Cancel multiple tickets.
      *
-     * @param (Ticket|int)[] $tickets     An array of Ticket::class or int to be cancelled
-     * @param User           $cancelledBy The User::class that called the cancellation
+     * @param (Ticket|int)[] $tickets    An array of Ticket::class or int to be canceled
+     * @param User           $canceledBy The User::class that called the cancellation
      *
-     * @return (Ticket|int)[] An array of either Ticket::class or ticket ids, whichever was provided to the method
+     * @return Ticket[] An array of Ticket::class entities
      */
-    public function cancelTickets(array $tickets, User $cancelledBy): array
+    public function cancelTickets(array $tickets, User $canceledBy): array
     {
         foreach ($tickets as $ticket) {
             if ($ticket instanceof Ticket) {
-                $this->cancelTicket($ticket, $cancelledBy);
+                $this->cancelTicket($ticket, $canceledBy);
             } elseif ($this->ensurePositiveInteger($ticket)) {
                 $this->cancelTicket(
                     $this->entityManager->getRepository(Ticket::class)->find($ticket),
-                    $cancelledBy
+                    $canceledBy
                 );
             }
         }
 
-        return $tickets;
+        return $this->getTickets($tickets);
     }
 
     /**
@@ -343,14 +343,6 @@ final readonly class TicketService
         return $this->entityManager->getRepository(Ticket::class)->findBy($filter);
     }
 
-    /**
-     *
-     * @param Ticket $ticket
-     * @param User $relatedUser
-     * @param string $subject
-     * @param string|null $message
-     * @return TicketHistory
-     */
     protected function addTicketHistory(Ticket $ticket, User $relatedUser, string $subject, ?string $message = null): TicketHistory
     {
         $ticketHistory = new TicketHistory();
@@ -369,10 +361,6 @@ final readonly class TicketService
         return $ticketHistory;
     }
 
-    /**
-     * @param mixed $int
-     * @return bool
-     */
     protected function ensurePositiveInteger(mixed $int): bool
     {
         return filter_var($int, FILTER_VALIDATE_INT, ['options' => ['min_range' => 0]]);

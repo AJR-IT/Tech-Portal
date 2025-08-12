@@ -14,7 +14,7 @@ class StatusFixture extends Fixture
             ['fullName' => 'Closed', 'friendlyName' => 'Closed', 'description' => 'Object is closed.'],
             ['fullName' => 'Resolved', 'friendlyName' => 'Resolved', 'description' => 'Object is resolved.'],
             ['fullName' => 'Open', 'friendlyName' => 'Open', 'description' => 'Object is open.'],
-            ['fullName' => 'Cancelled', 'friendlyName' => 'Cancelled', 'description' => 'Object is cancelled.'],
+            ['fullName' => 'Canceled', 'friendlyName' => 'Canceled', 'description' => 'Object is cancelled.'],
             ['fullName' => 'Waiting', 'friendlyName' => 'Waiting', 'description' => 'Object is waiting.'],
         ];
 
