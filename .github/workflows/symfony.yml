@@ -41,7 +41,10 @@ jobs:
       run: |
         mkdir -p data
         touch data/database.sqlite
-        run: bin/techportal dev:setup
+    - name: Copy Test Console
+      run: php -r "file_exists('bin/techportal') || copy('bin/techportal', 'techportal');"
+    - name: Create Test Environment
+      run: "php techportal dev:setup"
     - name: Execute tests (Unit and Feature tests) via PHPUnit
       env:
         DATABASE_URL: sqlite:///%kernel.project_dir%/data/database.sqlite
