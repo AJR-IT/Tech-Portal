@@ -8,7 +8,9 @@
 
     </head>
     <body>
+        {% if app.user is not null %}
         {% include 'partials/navbar.html.twig' %}
+        {% endif %}
 
         <!-- Main Content -->
         <div class="container-fluid content-wrapper bg-dark-subtle" style="min-height: 100vh;">

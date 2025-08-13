@@ -20,12 +20,13 @@ final readonly class TicketService
     /**
      * Create a new ticket.
      *
-     * @param array{assigned_user: User, assigned_group: UserGroup, closed_by: User, date_due: \DateTimeImmutable, original_message: string, requesting_user: User, resolved_user: User, subject: string} $data
+     * @param array $data
      *
      * @return Ticket|null Will return the Ticket::class entity or null on failure
      */
     public function createTicket(array $data): ?Ticket
     {
+        //     * @param array{assigned_user: User, assigned_group: UserGroup, closed_by: User, date_due: \DateTimeImmutable, original_message: string, requesting_user: User, resolved_user: User, subject: string} $data
         $ticket = new Ticket();
 
         /** @var Status $status */
@@ -42,10 +43,12 @@ final readonly class TicketService
                 ->setDateModified(new \DateTimeImmutable('now'))
                 ->setOriginalMessage($data['original_message'] ?? null)
                 ->setRequestingUser($data['requesting_user'] ?? null)
+                ->setModifiedBy($data['requesting_user'] ?? null)
                 ->setResolvedBy($data['resolved_user'] ?? null)
                 ->setResolvedDate((!is_null($data['resolved_user'])) ? new \DateTimeImmutable('now') : null)
                 ->setSubject($data['subject'] ?? null)
                 ->setStatus($status)
+                ->addTag($data['tags'])
             ;
 
             $this->entityManager->persist($ticket);

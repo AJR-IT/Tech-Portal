@@ -1,0 +1,23 @@
+{% if form is defined %}
+    {{ form_start(form, { 'attr': { 'class': 'w-full max-w-lg' } }) }}
+        <div class="card bg-light-subtle my-2">
+            <div class="card-header">
+                <h1 class="card-title">Create Ticket</h1>
+            </div>
+            <div class="card-body">
+                {{ form_label(form.subject, 'Subject', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.subject, {'attr': { 'class': 'form-control'}}) }}
+                {{ form_label(form.dateDue, 'Due Date', {'label_attr': {'class': 'form-label mt-2'}}) }}
+                {{ form_widget(form.dateDue, {'attr': {'class': 'form-control'}}) }}
+                {{ form_label(form.tags, 'Tags', {'label_attr': {'class': 'form-label mt-2'}}) }}
+                {{ form_widget(form.tags, {'attr': {'class': 'form-control'}}) }}
+                {{ form_label(form.originalMessage, 'Message', {'label_attr': {'class': 'form-label mt-2'}}) }}
+                {{ form_widget(form.originalMessage, {'attr': {'class': 'form-control', 'rows': 5}}) }}
+            </div>
+            <div class="card-footer text-end">
+                <a href="{{ path('app_index') }}" role="button" class="btn btn-secondary">Cancel</a>
+                {{ form_widget(form.submit, {'attr': {'class': 'btn btn-success'}}) }}
+            </div>
+        </div>
+    {{ form_end(form) }}
+{% endif %}

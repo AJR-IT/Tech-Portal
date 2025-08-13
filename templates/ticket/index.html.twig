@@ -5,7 +5,7 @@
 {% block body %}
     <div class="row">
         <div class="card shadow-sm">
-            tickets
+            {% include 'ticket/components/form/full_form.html.twig' with { form: form } %}
         </div>
     </div>
 {% endblock %}

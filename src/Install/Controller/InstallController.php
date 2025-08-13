@@ -15,6 +15,7 @@ use App\Install\Entity\TicketAction;
 use App\Install\Entity\UserGroup;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Bundle\WebProfilerBundle\EventListener\WebDebugToolbarListener;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
@@ -56,6 +57,8 @@ class InstallController extends AbstractController
         if ($this->verifyInstalled()) {
             return $this->redirectToRoute('app_index');
         }
+
+//        $this->webDebugToolbarListener->setMode(WebDebugToolbarListener::DISABLED);
 
         $installForm = $this->setUpInstallationForm();
         $installForm->handleRequest($request);

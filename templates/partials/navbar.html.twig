@@ -22,7 +22,7 @@
                 <li class="nav-item dropdown">
                     <button class="nav-link dropdown-toggle d-flex align-items-center" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="bi bi-person-circle fs-4 me-2"></i>
-                        <span>John Doe</span>
+                        <span>{{ app.user.getLastName() ~ ', ' ~ app.user.getFirstName(0) }}</span>
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end">
                         <li><a class="dropdown-item" href="{{ path('app_user_profile') }}">👤 My Profile</a></li>
@@ -35,7 +35,7 @@
                             </div>
                         </li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item text-danger" href="#">🚪 Sign Out</a></li>
+                        <li><a class="dropdown-item text-danger" href="{{ path('app_logout') }}">🚪 Sign Out</a></li>
                     </ul>
                 </li>
             </ul>

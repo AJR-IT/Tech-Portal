@@ -56,13 +56,14 @@ class RecoverAdminUserCommand extends Command
         $username = $input->getArgument('username') ?? $this->defaultCredenetials['username'];
 
         /** @var string $plainPassword */
-        $plainPassword = $input->getArgument('password') ?? $this->defaultCredenetials['password'];
+        $plainPassword = $input->getArgument('password') ?? $this->defaultCredenetials['plainPassword'];
 
         $user = $this->userRepository->findOneBy(['username' => $username]);
 
         if (!$user instanceof User) {
             $user = new User();
             $user->setEmail($this->defaultCredenetials['email']);
+            $user->setDateCreated(new \DateTimeImmutable());
             $user->setUsername($username);
             $user->setRoles(['ROLE_ADMIN']);
         }
