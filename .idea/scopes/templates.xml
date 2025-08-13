@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="templates" pattern="file[TechPortal2]:templates//*" />
+</component>
