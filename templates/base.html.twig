@@ -9,28 +9,33 @@
     </head>
     <body>
         {% if app.user is not null %}
-        {% include 'partials/navbar.html.twig' %}
+            {% include 'partials/navbar.html.twig' %}
         {% endif %}
 
-        <!-- Main Content -->
         <div class="container-fluid content-wrapper bg-dark-subtle" style="min-height: 100vh;">
-            <div class="container py-4">
-                {% block body %}
-                    <h1>Welcome to Device Tracker</h1>
-                    <p class="text-muted">Manage devices, assign users, track repairs, and build reports.</p>
-
-                    <!-- Example content card -->
+            <div class="my-4 mx-4">
+                <div class="row">
                     <div class="card shadow-sm">
-                        <div class="card-body">
-                            <h5 class="card-title">Getting Started</h5>
-                            <p class="card-text">Start by adding devices or users, or import from your existing inventory system.</p>
-                        </div>
+                        {% block body %}
+                            <h1>Welcome to Device Tracker</h1>
+                            <p class="text-muted">Manage devices, assign users, track repairs, and build reports.</p>
+
+                            <div class="card shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="card-title">Getting Started</h5>
+                                    <p class="card-text">Start by adding devices or users, or import from your existing inventory system.</p>
+                                </div>
+                            </div>
+                        {% endblock %}
                     </div>
-                {% endblock %}
+                </div>
             </div>
         </div>
 
         {% include 'partials/aside.html.twig' %}
+
+        {% block modal %}{% endblock %}
+
         {% block javascripts %}
             {% block importmap %}{{ importmap('app') }}{% endblock %}
         {% endblock %}

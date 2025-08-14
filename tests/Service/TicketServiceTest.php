@@ -2,6 +2,7 @@
 
 namespace App\Tests\Service;
 
+use App\Entity\Comment;
 use App\Entity\Status;
 use App\Entity\Ticket;
 use App\Entity\TicketHistory;
@@ -41,13 +42,9 @@ class TicketServiceTest extends KernelTestCase
         $this->testTechnicianUser = $userRepository->findOneBy(['username' => 'testTechnician']);
 
         $this->testTicketData = [
-            'assigned_user' => null,
-            'assigned_group' => null,
-            'closed_by' => null,
-            'date_due' => null,
+            'date_due' => new \DateTimeImmutable('+1 day'),
             'original_message' => 'This is a test message',
-            'requesting_user' => $this->testRequestUser,
-            'resolved_user' => null,
+            'requested_by' => $this->testRequestUser,
             'subject' => 'This is a test subject',
         ];
     }
@@ -320,5 +317,27 @@ class TicketServiceTest extends KernelTestCase
         $this->ticketService->changeStatus($ticket, $closedStatus, $this->testTechnicianUser);
 
         $this->assertEquals('Closed', $ticket->getStatus()->getFriendlyName(), 'Ticket status should be Closed.');
+    }
+
+    public function testAddComment(): void
+    {
+        $ticket = $this->ticketService->createTicket($this->testTicketData);
+
+        $comment = new Comment();
+
+        $comment->setSubject('Test Comment')
+            ->setComment('This is a test comment')
+            ->setTicket($ticket)
+            ->setCreatedByUser($this->testRequestUser)
+            ->setDateCreated(new \DateTimeImmutable())
+        ;
+
+        $this->entityManager->persist($comment);
+
+        $this->entityManager->flush();
+
+        $updatedTicket = $this->ticketService->addComment($ticket, $comment);
+
+        $this->assertInstanceOf(Comment::class, $updatedTicket->getComments()[0], 'Ticket should have a comment added.');
     }
 }

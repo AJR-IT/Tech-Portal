@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="techportaldb@localhost" uuid="3800210c-1948-4af6-a0ea-340220cb1683">
+    <data-source source="LOCAL" name="techportal@localhost" uuid="34af25b3-18c9-48d5-8b8e-c123b31efe6b">
       <driver-ref>mysql.8</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
-      <jdbc-url>jdbc:mysql://localhost:3306/techportaldb</jdbc-url>
+      <jdbc-url>jdbc:mysql://localhost:3306/techportal</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
-    <data-source source="LOCAL" name="techportaldb_test" uuid="4682aa06-1fb9-4a90-bd97-a2a34a4b17ab">
+    <data-source source="LOCAL" name="techportal_test@localhost" uuid="a1ac7d3f-6d98-4440-9455-de7850d72910">
       <driver-ref>mysql.8</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
-      <jdbc-url>jdbc:mysql://localhost:3306/techportaldb_test</jdbc-url>
+      <jdbc-url>jdbc:mysql://localhost:3306/techportal_test</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
   </component>

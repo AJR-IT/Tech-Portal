@@ -3,9 +3,18 @@
 {% block title %}Tickets{% endblock %}
 
 {% block body %}
-    <div class="row">
-        <div class="card shadow-sm">
-            {% include 'ticket/components/form/full_form.html.twig' with { form: form } %}
-        </div>
-    </div>
+    {% for ticket in tickets %}
+        <p>
+            ID: {{ ticket.id }}<br />
+            Status: {{ ticket.status.friendlyName }}<br />
+            Requester: {{ ticket.requestingUser.getUsername() }}<br />
+            Created: {{ ticket.dateCreated|date('Y-m-d h:i') }}<br />
+            Tags:
+            {% for tag in ticket.tags %}
+                {{ tag.friendlyName }}
+            {% endfor %}
+            <br />
+            <a href="{{ path('app_ticket_show', {'id': ticket.id}) }}">Link</a>
+        </p>
+    {% endfor %}
 {% endblock %}

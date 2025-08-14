@@ -1,0 +1,7 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tickets{% endblock %}
+
+{% block body %}
+    {% include 'ticket/components/form/full_form.html.twig' with { form: form } %}
+{% endblock %}

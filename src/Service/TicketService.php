@@ -2,12 +2,12 @@
 
 namespace App\Service;
 
+use App\Entity\Comment;
 use App\Entity\Status;
 use App\Entity\Ticket;
 use App\Entity\TicketAction;
 use App\Entity\TicketHistory;
 use App\Entity\User;
-use App\Entity\UserGroup;
 use App\Repository\StatusRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -20,13 +20,10 @@ final readonly class TicketService
     /**
      * Create a new ticket.
      *
-     * @param array $data
-     *
      * @return Ticket|null Will return the Ticket::class entity or null on failure
      */
     public function createTicket(array $data): ?Ticket
     {
-        //     * @param array{assigned_user: User, assigned_group: UserGroup, closed_by: User, date_due: \DateTimeImmutable, original_message: string, requesting_user: User, resolved_user: User, subject: string} $data
         $ticket = new Ticket();
 
         /** @var Status $status */
@@ -34,22 +31,34 @@ final readonly class TicketService
 
         try {
             $ticket
-                ->setDateCreated(new \DateTimeImmutable('now'))
                 ->setAssignedGroup($data['assigned_group'] ?? null)
-                ->setAssignedUser($data['assigned_user'] ?? null)
-                ->setClosedBy($data['closed_by'] ?? null)
-                ->setClosedDate((!is_null($data['closed_by'])) ? new \DateTimeImmutable('now') : null)
+                ->setAssignedUser($data['assigned_to'] ?? null)
                 ->setDateDue($data['date_due'] ?? null)
-                ->setDateModified(new \DateTimeImmutable('now'))
                 ->setOriginalMessage($data['original_message'] ?? null)
-                ->setRequestingUser($data['requesting_user'] ?? null)
-                ->setModifiedBy($data['requesting_user'] ?? null)
-                ->setResolvedBy($data['resolved_user'] ?? null)
-                ->setResolvedDate((!is_null($data['resolved_user'])) ? new \DateTimeImmutable('now') : null)
+                ->setRequestingUser($data['requested_by'] ?? null)
+                ->setModifiedBy($data['requested_by'] ?? null)
+                ->setResolvedBy($data['resolved_by'] ?? null)
                 ->setSubject($data['subject'] ?? null)
                 ->setStatus($status)
-                ->addTag($data['tags'])
+                ->setDateModified(new \DateTimeImmutable())
+                ->setDateCreated(new \DateTimeImmutable())
             ;
+
+            if (array_key_exists('closed_by', $data)) {
+                $ticket->setClosedBy($data['closed_by'])
+                    ->setClosedDate(new \DateTimeImmutable());
+            }
+
+            if (array_key_exists('resolved_by', $data)) {
+                $ticket->setResolvedBy($data['resolved_by'])
+                    ->setResolvedDate(new \DateTimeImmutable());
+            }
+
+            if (array_key_exists('tags', $data)) {
+                foreach ($data['tags'] as $tag) {
+                    $ticket->addTag($tag);
+                }
+            }
 
             $this->entityManager->persist($ticket);
 
@@ -344,6 +353,21 @@ final readonly class TicketService
         }
 
         return $this->entityManager->getRepository(Ticket::class)->findBy($filter);
+    }
+
+    /**
+     * Add a comment to a ticket.
+     *
+     * @param Ticket $ticket
+     * @param Comment $comment
+     *
+     * @return Ticket
+     */
+    public function addComment(Ticket $ticket, Comment $comment): Ticket
+    {
+        $ticket->addComment($comment);
+
+        return $this->updateTicket($ticket, $comment->getCreatedByUser());
     }
 
     protected function addTicketHistory(Ticket $ticket, User $relatedUser, string $subject, ?string $message = null): TicketHistory
