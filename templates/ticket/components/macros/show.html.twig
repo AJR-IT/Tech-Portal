@@ -1,0 +1,61 @@
+{% macro show_ticket_item(ticket) %}
+    <div id="ticket_show" class="container-fluid my-2" data-ticket-id="{{ ticket.id }}">
+        <div class="row">
+            <div class="col-lg-9">
+                <div class="card">
+                    <div class="card-header">
+                        <h1 class="card-title">
+                            {{ ticket.id }} - {{ ticket.subject }}
+                        </h1>
+                    </div>
+                    <div class="card-body">
+                        {{ ticket.originalMessage }}
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title">Information</h4>
+                    </div>
+                    <div class="card-body">
+
+                        <div class="row">
+                            <div class="col">Requested by:</div>
+                            <div class="col">
+                                <a href="#">{{ ticket.requestingUser.username }}</a>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col">Assigned to:</div>
+                            <div class="col">
+                                {% if ticket.assignedUser is null %}
+                                    <a href="#">Assign Me</a>
+                                {% else %}
+                                    <a href="#">{{ ticket.assignedUser.username }}</a>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col">Status</div>
+                            <div class="col">{{ ticket.status.friendlyName }}</div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col">Tags</div>
+                            <div class="col">
+                                {% set tags = [] %}
+                                {% for tag in ticket.tags %}
+                                    {% set tags = tags|merge([tag.friendlyName]) %}
+                                {% endfor %}
+                                {{ tags|join(', ') }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endmacro %}

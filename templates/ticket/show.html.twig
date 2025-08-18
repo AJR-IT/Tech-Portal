@@ -1,8 +1,7 @@
 {% extends 'base.html.twig' %}
 
+{% import 'ticket/components/macros/show.html.twig' as show %}
+
 {% block body %}
-    {{ ticket.id }} - {{ ticket.subject }} - Requested By: <a href="#" class="link-info">{{ ticket.requestingUser.firstname ~ ', ' ~ticket.requestingUser.firstname }}</a>
-    <p>
-        {{ ticket.originalMessage }}
-    </p>
+    {{ show.show_ticket_item(ticket) }}
 {% endblock %}
