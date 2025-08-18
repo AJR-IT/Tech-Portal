@@ -47,14 +47,19 @@ class TicketServiceTest extends KernelTestCase
             'requested_by' => $this->testRequestUser,
             'subject' => 'This is a test subject',
         ];
+
+        parent::setUp();
     }
 
     protected function tearDown(): void
     {
         $this->truncateEntities([
+            Comment::class,
             Ticket::class,
             TicketHistory::class,
         ]);
+
+        parent::tearDown();
     }
 
     protected function truncateEntities(array $entities): void
@@ -325,11 +330,13 @@ class TicketServiceTest extends KernelTestCase
 
         $comment = new Comment();
 
-        $comment->setSubject('Test Comment')
+        $comment
+            ->setSubject('Test Comment')
             ->setComment('This is a test comment')
             ->setTicket($ticket)
             ->setCreatedByUser($this->testRequestUser)
             ->setDateCreated(new \DateTimeImmutable())
+            ->setPublished(false)
         ;
 
         $this->entityManager->persist($comment);
@@ -338,6 +345,41 @@ class TicketServiceTest extends KernelTestCase
 
         $updatedTicket = $this->ticketService->addComment($ticket, $comment);
 
-        $this->assertInstanceOf(Comment::class, $updatedTicket->getComments()[0], 'Ticket should have a comment added.');
+        $this->assertCount(1, $updatedTicket->getComments(), 'Ticket should have a comment added.');
+        $this->assertEquals('Test Comment', $updatedTicket->getComments()[0]->getSubject(), 'Ticket should have a comment added.');
+        $this->assertEquals('This is a test comment', $updatedTicket->getComments()[0]->getComment(), 'Ticket should have a comment added.');
+        $this->assertEquals('testRequester', $updatedTicket->getComments()[0]->getCreatedByUser()->getUsername(), 'Ticket should have a comment added.');
+    }
+
+    public function testCommentVisibility(): void
+    {
+        $ticket = $this->ticketService->createTicket($this->testTicketData);
+        $ticket->setAssignedUser($this->testTechnicianUser);
+        $this->ticketService->updateTicket($ticket, $this->testTechnicianUser);
+
+        $comment = new Comment();
+
+        $comment
+            ->setSubject('Test Comment')
+            ->setComment('This is a test comment')
+            ->setTicket($ticket)
+            ->setCreatedByUser($this->testTechnicianUser)
+            ->setDateCreated(new \DateTimeImmutable())
+            ->setPublished(false)
+        ;
+
+        $this->entityManager->persist($comment);
+
+        $this->entityManager->flush();
+
+        $updatedTicket = $this->ticketService->addComment($ticket, $comment);
+
+        $requesterComments = $this->ticketService->getComments($updatedTicket, $this->testRequestUser);
+
+        $technicianComments = $this->ticketService->getComments($updatedTicket, $this->testTechnicianUser);
+
+        $this->assertCount(0, $requesterComments, 'Ticket should not have a comment visible to request user.');
+
+        $this->assertCount(1, $technicianComments, 'Ticket should have a comment visible to technician user.');
     }
 }

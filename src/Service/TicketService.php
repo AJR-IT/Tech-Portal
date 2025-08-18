@@ -9,6 +9,7 @@ use App\Entity\TicketAction;
 use App\Entity\TicketHistory;
 use App\Entity\User;
 use App\Repository\StatusRepository;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
 
 final readonly class TicketService
@@ -357,17 +358,39 @@ final readonly class TicketService
 
     /**
      * Add a comment to a ticket.
-     *
-     * @param Ticket $ticket
-     * @param Comment $comment
-     *
-     * @return Ticket
      */
     public function addComment(Ticket $ticket, Comment $comment): Ticket
     {
         $ticket->addComment($comment);
 
         return $this->updateTicket($ticket, $comment->getCreatedByUser());
+    }
+
+    /**
+     * Retrieve comments for a ticket.
+     *
+     * @param Ticket $ticket      The Ticket::class entity to retrieve comments for
+     * @param User   $currentUser The User::class entity that is currently logged in
+     *
+     * @return Collection<int, Comment>|array<int, Comment> Returns either a Collection of Comment::class or an array of Comment::class
+     */
+    public function getComments(Ticket $ticket, User $currentUser): Collection|array
+    {
+        $ticketComments = $ticket->getComments();
+
+        if ($currentUser->isAdmin() || ($ticket->getAssignedUser() === $currentUser)) {
+            return $ticketComments;
+        }
+
+        $comments = [];
+
+        foreach ($ticketComments as $comment) {
+            if ($comment->isPublished()) {
+                $comments[] = $comment;
+            }
+        }
+
+        return $comments;
     }
 
     protected function addTicketHistory(Ticket $ticket, User $relatedUser, string $subject, ?string $message = null): TicketHistory
