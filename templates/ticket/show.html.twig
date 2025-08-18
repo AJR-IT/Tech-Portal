@@ -1,5 +1,8 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    {{ ticket.id }} - {{ ticket.subject }}
+    {{ ticket.id }} - {{ ticket.subject }} - Requested By: <a href="#" class="link-info">{{ ticket.requestingUser.firstname ~ ', ' ~ticket.requestingUser.firstname }}</a>
+    <p>
+        {{ ticket.originalMessage }}
+    </p>
 {% endblock %}

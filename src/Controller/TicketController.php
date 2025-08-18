@@ -47,6 +47,8 @@ final class TicketController extends AbstractController
                 'date_due' => $data['dateDue'],
                 'tags' => $data['tags'],
             ]);
+
+            return $this->redirectToRoute('app_ticket_show', ['id' => $ticket->getId()]);
         }
 
         return $this->render('ticket/new.html.twig', [

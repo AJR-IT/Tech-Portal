@@ -32,12 +32,12 @@ use Symfony\Component\Routing\Attribute\Route;
 class InstallController extends AbstractController
 {
     /**
-     * True if install process had an error.
+     * True if an installation process had an error.
      */
     private bool $errorInstalling = false;
 
     /**
-     * Array of messages during installation process.
+     * Array of messages during an installation process.
      */
     private array $messages = [];
 
@@ -57,8 +57,6 @@ class InstallController extends AbstractController
         if ($this->verifyInstalled()) {
             return $this->redirectToRoute('app_index');
         }
-
-//        $this->webDebugToolbarListener->setMode(WebDebugToolbarListener::DISABLED);
 
         $installForm = $this->setUpInstallationForm();
         $installForm->handleRequest($request);

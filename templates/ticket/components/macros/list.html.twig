@@ -1,0 +1,11 @@
+{% macro list_ticket_item(ticket) %}
+    <div class="container-fluid my-2">
+        <div class="card">
+            <a href="{{ path('app_ticket_show', {'id': ticket.id}) }}">
+                <div class="card-body">
+                    {{ ticket.id }} - {{ ticket.subject }} : {{ ticket.originalMessage }}
+                </div>
+            </a>
+        </div>
+    </div>
+{% endmacro %}
