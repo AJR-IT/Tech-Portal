@@ -10,7 +10,7 @@ final readonly class DeviceService
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
-        private DeviceRepository       $deviceRepository)
+        private DeviceRepository $deviceRepository)
     {
     }
 
