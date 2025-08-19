@@ -1,4 +1,4 @@
-{% macro show_ticket_item(ticket) %}
+{% macro show_ticket_item(ticket, assignableUsers) %}
     <div id="ticket_show" class="container-fluid" data-ticket-id="{{ ticket.id }}">
         <div class="row">
             <div class="col-lg-9">
@@ -37,7 +37,7 @@
                             <div class="col">Assigned to:</div>
                             <div class="col">
                                 {% if ticket.assignedUser is null %}
-                                    <a href="#">Assign Me</a>
+                                    <button class="btn btn-sm btn-primary" role="button" data-bs-toggle="modal" data-bs-target="#assign_user_modal">Assign User</button>
                                 {% else %}
                                     <a href="#">{{ ticket.assignedUser.username }}</a>
                                 {% endif %}
@@ -62,4 +62,37 @@
             </div>
         </div>
     </div>
+
+    <div id="assign_user_modal" class="modal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <form>
+                        <select id="assign_user_select" class="form-select">
+                            {% for user in assignableUsers %}
+                                <option value="" selected>Choose User</option>
+                                <option value="{{ user.id }}">{{ user.lastName ~ ', ' ~ user.firstName }}</option>
+                            {% endfor %}
+                        </select>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const assignUserModal = document.getElementById('assign_user_modal')
+        const assignUserSelect = document.getElementById('assign_user_select')
+
+        assignUserModal.addEventListener('shown.bs.modal', () => {
+            assignUserSelect.focus();
+
+            assignUserSelect.on('change', function() {
+                let val = $('#assign_user_select option:selected').text();
+                alert(val);
+
+                // TODO fire off ajax query
+            });
+        });
+    </script>
 {% endmacro %}

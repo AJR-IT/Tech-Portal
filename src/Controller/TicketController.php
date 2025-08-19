@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Ticket;
 use App\Entity\User;
 use App\Form\NewTicketType;
+use App\Repository\UserRepository;
 use App\Service\TicketService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -71,12 +72,16 @@ final class TicketController extends AbstractController
      * Show a ticket.
      */
     #[Route('/{id}', name: 'show')]
-    public function showTicket(int $id): Response
+    public function showTicket(UserRepository $userRepository, int $id): Response
     {
+//        $assignableUsers = $userRepository->getAssignableUsers('ticket');
+        $assignableUsers = $userRepository->findAll();
+
         $ticket = $this->ticketService->getTicket($id);
 
         return $this->render('ticket/show.html.twig', [
             'ticket' => $ticket,
+            'assignableUsers' => $assignableUsers,
         ]);
     }
 }

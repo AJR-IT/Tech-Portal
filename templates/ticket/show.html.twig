@@ -3,5 +3,5 @@
 {% import 'ticket/components/macros/show.html.twig' as show %}
 
 {% block body %}
-    {{ show.show_ticket_item(ticket) }}
+    {{ show.show_ticket_item(ticket, assignableUsers) }}
 {% endblock %}
