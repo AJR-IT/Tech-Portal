@@ -1,0 +1,32 @@
+<script>
+    const ajaxUtil = {
+        x: function() {
+            return typeof XMLHttpRequest !== 'undefined' ? new XMLHttpRequest() : new ActiveXObject('Microsoft.XMLHTTP');
+        },
+
+        send: function(url, callback, method = 'GET', data = null, async = true) {
+            let xhr = this.x();
+            xhr.open(method, url, async);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    callback(xhr.responseText);
+                }
+            };
+            if (method === 'POST')
+            {
+                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            }
+            xhr.send(data);
+        },
+
+        get: function(url, params, callback) {
+            let queryString = Object.keys(params).map(key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`).join('&');
+            this.send(url + (queryString ? '?' + queryString : ''), callback, 'GET');
+        },
+
+        post: function(url, data, callback) {
+            let queryString = Object.keys(data).map(key => `${encodeURIComponent(key)}=${encodeURIComponent(data[key])}`).join('&');
+            this.send(url, callback, 'POST', queryString);
+        }
+    }
+</script>

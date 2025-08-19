@@ -1,12 +1,15 @@
 #!/usr/bin/env php
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 main($argv);
+
 function main($argv): void
 {
     if (count($argv) < 2) {
-        echo 'Usage: php bin/techportal <command> [args..]' . PHP_EOL;
-        echo 'Available commands: dev_setup' . PHP_EOL;
+        echo 'Usage: php bin/techportal <command> [args..]'.PHP_EOL;
+        echo 'Available commands: dev:setup, local:setup'.PHP_EOL;
         exit(1);
     }
 
@@ -18,6 +21,15 @@ function main($argv): void
             run('php bin/console --env=test doctrine:database:create --no-interaction');
             run('php bin/console --env=test doctrine:schema:create --no-interaction');
             run('php bin/console --env=test doctrine:fixtures:load --no-interaction');
+            run('php bin/console cache:clear --no-warmup');
+            break;
+        case 'local:setup':
+            run('php bin/console doctrine:database:drop --no-interaction --force --if-exists');
+            run('php bin/console doctrine:database:create --no-interaction');
+            run('php bin/console doctrine:schema:create --no-interaction');
+            run('php bin/console doctrine:fixtures:load --no-interaction');
+            run('php bin/console cache:clear --no-warmup');
+            removeLockFile();
     }
 }
 
@@ -25,8 +37,17 @@ function run(string $cmd): void
 {
     echo ">>> Running {$cmd}";
     passthru($cmd, $exitCode);
-    if ($exitCode !== 0) {
+    if (0 !== $exitCode) {
         echo "Command failed with exit code {$exitCode}\n";
         exit($exitCode);
+    }
+}
+
+function removeLockFile(): void
+{
+    $lockFile = __DIR__.'/../var/install.lock';
+
+    if (file_exists($lockFile)) {
+        unlink($lockFile);
     }
 }

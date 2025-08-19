@@ -24,7 +24,7 @@
                     <div class="card-header">
                         <h4 class="card-title">Information</h4>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body bg-body-secondary">
 
                         <div class="row">
                             <div class="col">Requested by:</div>
@@ -36,11 +36,13 @@
                         <div class="row">
                             <div class="col">Assigned to:</div>
                             <div class="col">
-                                {% if ticket.assignedUser is null %}
-                                    <button class="btn btn-sm btn-primary" role="button" data-bs-toggle="modal" data-bs-target="#assign_user_modal">Assign User</button>
-                                {% else %}
-                                    <a href="#">{{ ticket.assignedUser.username }}</a>
-                                {% endif %}
+                                <span id="assign_user_span">
+                                    {% if ticket.assignedUser is null %}
+                                        <button class="btn btn-sm btn-primary" role="button" data-bs-toggle="modal" data-bs-target="#assign_user_modal">Assign User</button>
+                                    {% else %}
+                                        <a href="#">{{ ticket.assignedUser.username }}</a>
+                                    {% endif %}
+                                </span>
                             </div>
                         </div>
 
@@ -68,9 +70,10 @@
             <div class="modal-content">
                 <div class="modal-body">
                     <form>
+                        <label class="form-label" for="assign_user_select">Assign a user</label>
                         <select id="assign_user_select" class="form-select">
                             {% for user in assignableUsers %}
-                                <option value="" selected>Choose User</option>
+                                <option value="choose" selected>Choose User</option>
                                 <option value="{{ user.id }}">{{ user.lastName ~ ', ' ~ user.firstName }}</option>
                             {% endfor %}
                         </select>
@@ -80,19 +83,36 @@
         </div>
     </div>
 
-    <script>
-        const assignUserModal = document.getElementById('assign_user_modal')
-        const assignUserSelect = document.getElementById('assign_user_select')
+    {% block javascripts %}
+        <script>
+            let assignUserModal = document.getElementById('assign_user_modal');
+            let assignUserSelect = document.getElementById('assign_user_select');
 
-        assignUserModal.addEventListener('shown.bs.modal', () => {
-            assignUserSelect.focus();
+            assignUserModal.addEventListener('shown.bs.modal', () => {
+                assignUserSelect.focus()
 
-            assignUserSelect.on('change', function() {
-                let val = $('#assign_user_select option:selected').text();
-                alert(val);
+                assignUserSelect.onchange = (event) => {
+                    let val = event.target.value.toString();
 
-                // TODO fire off ajax query
+                    ajaxUtil.post('{{ path('app_ticket_update_assign') }}', {'userId': val, 'ticketId': {{ ticket.id }}}, function(response) {
+                        let json = JSON.parse(response);
+
+                        if (json.success) {
+                            let modalBd = document.getElementsByClassName('modal-backdrop');
+                            let assignUserSpan = document.getElementById('assign_user_span');
+                            assignUserSpan.innerHTML = '<a href="#" data-userid="' + json.payload.data.userId + '">' + json.payload.data.user.lastName + ', ' + json.payload.data.user.firstName + '</a>';
+
+                            assignUserModal.classList.remove('show');
+                            assignUserModal.style.display = 'none';
+                            modalBd[0].remove();
+                            assignUserModal.remove();
+                        }
+                    });
+                }
             });
-        });
-    </script>
+        </script>
+
+        {% include 'partials/javascript/ajax.html.twig' %}
+    {% endblock %}
+
 {% endmacro %}
