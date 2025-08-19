@@ -41,8 +41,13 @@ final readonly class DeviceService
         return $device;
     }
 
-    public function getDeviceById(int $device): ?Device
+    public function findById(int $device): ?Device
     {
         return $this->deviceRepository->find($device);
+    }
+
+    public function findBy(array $filter = []): array
+    {
+        return $this->deviceRepository->findBy($filter);
     }
 }
