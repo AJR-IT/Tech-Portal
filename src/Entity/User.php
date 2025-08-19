@@ -111,6 +111,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $lsatLogonIp = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $ticketDateFormat = null;
+
     public function __construct()
     {
         $this->ticketsSubmitted = new ArrayCollection();
@@ -549,5 +552,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function isAdmin(): bool
     {
         return in_array('ROLE_ADMIN', $this->roles, true);
+    }
+
+    public function getTicketDateFormat(): ?string
+    {
+        return $this->ticketDateFormat;
+    }
+
+    public function setTicketDateFormat(?string $ticketDateFormat): static
+    {
+        $this->ticketDateFormat = $ticketDateFormat;
+
+        return $this;
     }
 }

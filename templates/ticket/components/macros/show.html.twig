@@ -1,12 +1,18 @@
 {% macro show_ticket_item(ticket) %}
-    <div id="ticket_show" class="container-fluid my-2" data-ticket-id="{{ ticket.id }}">
+    <div id="ticket_show" class="container-fluid" data-ticket-id="{{ ticket.id }}">
         <div class="row">
             <div class="col-lg-9">
                 <div class="card">
                     <div class="card-header">
-                        <h1 class="card-title">
+                        <h4 class="card-title">
                             {{ ticket.id }} - {{ ticket.subject }}
-                        </h1>
+                        </h4>
+                    </div>
+                    <div class="card-header bg-light-subtle">
+                        Submitted on: {{ ticket.dateCreated|date(app.user.ticketDateFormat) }}
+                        {% if ticket.dateModified == ticket.dateCreated %}
+                            Modified on: {{ ticket.dateModified|date(app.user.ticketDateFormat) }}
+                        {% endif %}
                     </div>
                     <div class="card-body">
                         {{ ticket.originalMessage }}
@@ -46,11 +52,9 @@
                         <div class="row">
                             <div class="col">Tags</div>
                             <div class="col">
-                                {% set tags = [] %}
                                 {% for tag in ticket.tags %}
-                                    {% set tags = tags|merge([tag.friendlyName]) %}
+                                     <a href="#" class="badge rounded-pill text-bg-primary link-underline link-underline-opacity-0">{{ tag.friendlyName }}</a>
                                 {% endfor %}
-                                {{ tags|join(', ') }}
                             </div>
                         </div>
                     </div>
