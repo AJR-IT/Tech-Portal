@@ -114,6 +114,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $ticketDateFormat = null;
 
+    /**
+     * @var Collection<int, Device>
+     */
+    #[ORM\OneToMany(targetEntity: Device::class, mappedBy: 'assignedTo')]
+    private Collection $assignedDevices;
+
     public function __construct()
     {
         $this->ticketsSubmitted = new ArrayCollection();
@@ -123,6 +129,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->userGroups = new ArrayCollection();
         $this->resolvedTickets = new ArrayCollection();
         $this->closedTickets = new ArrayCollection();
+        $this->assignedDevices = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -562,6 +569,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setTicketDateFormat(?string $ticketDateFormat): static
     {
         $this->ticketDateFormat = $ticketDateFormat;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Device>
+     */
+    public function getAssignedDevices(): Collection
+    {
+        return $this->assignedDevices;
+    }
+
+    public function addAssignedDevice(Device $assignedDevice): static
+    {
+        if (!$this->assignedDevices->contains($assignedDevice)) {
+            $this->assignedDevices->add($assignedDevice);
+            $assignedDevice->setAssignedTo($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAssignedDevice(Device $assignedDevice): static
+    {
+        if ($this->assignedDevices->removeElement($assignedDevice)) {
+            // set the owning side to null (unless already changed)
+            if ($assignedDevice->getAssignedTo() === $this) {
+                $assignedDevice->setAssignedTo(null);
+            }
+        }
 
         return $this;
     }
