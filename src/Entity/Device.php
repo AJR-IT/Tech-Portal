@@ -54,6 +54,16 @@ class Device
     }
 
     /**
+     * Get devices unique identifier.
+     *
+     * @return mixed
+     */
+    public function getUniqueIdentifier(): mixed
+    {
+        return $this->assetTag;
+    }
+
+    /**
      * Generate a random string. Can be used for asset tags, serial numbers, etc.
      *
      * @param int $length
