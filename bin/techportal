@@ -17,7 +17,7 @@ function main($argv): void
 
     switch ($command) {
         case 'test:setup':
-            run('php bin/console --env=test doctrine:database:drop --no-interaction --force --if-exists');
+            //run('php bin/console --env=test doctrine:database:drop --no-interaction --force --if-exists');
             run('php bin/console --env=test doctrine:database:create --no-interaction');
             run('php bin/console --env=test doctrine:schema:create --no-interaction');
             run('php bin/console --env=test doctrine:fixtures:load --no-interaction');
