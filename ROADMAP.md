@@ -34,3 +34,4 @@
 _how to handle?_
 - [ ] Collection should just place device into storage record
 - [ ] Distribution should clear that record
+- [ ] Kiosk for distribution

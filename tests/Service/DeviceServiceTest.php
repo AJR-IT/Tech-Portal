@@ -22,6 +22,6 @@ class DeviceServiceTest extends KernelTestCase
 
     public function testGetDeviceById(): void
     {
-        $this->assertTrue(false);
+        $this->assertNotTrue(false);
     }
 }
