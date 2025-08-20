@@ -8,7 +8,7 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class DeviceServiceTest extends KernelTestCase
 {
-    public function testCreate()
+    public function testCreate(): void
     {
         self::bootKernel();
 
@@ -20,7 +20,7 @@ class DeviceServiceTest extends KernelTestCase
         $this->assertInstanceOf(Device::class, $device);
     }
 
-    public function testGetDeviceById()
+    public function testGetDeviceById(): void
     {
         $this->assertTrue(false);
     }
