@@ -3,6 +3,8 @@
 
 declare(strict_types=1);
 
+require_once __DIR__.'/../vendor/autoload.php';
+
 main($argv);
 
 function main($argv): void
@@ -17,8 +19,11 @@ function main($argv): void
 
     switch ($command) {
         case 'test:setup':
-            //run('php bin/console --env=test doctrine:database:drop --no-interaction --force --if-exists');
-            run('php bin/console --env=test doctrine:database:create --no-interaction');
+            if (!databaseUrlIsSqlite()) {
+                run('php bin/console --env=test doctrine:database:drop --no-interaction --force --if-exists');
+                run('php bin/console --env=test doctrine:database:create --no-interaction');
+            }
+
             run('php bin/console --env=test doctrine:schema:create --no-interaction');
             run('php bin/console --env=test doctrine:fixtures:load --no-interaction');
             run('php bin/console cache:clear --no-warmup');
@@ -50,4 +55,13 @@ function removeLockFile(): void
     if (file_exists($lockFile)) {
         unlink($lockFile);
     }
+}
+
+function databaseUrlIsSqlite(): bool
+{
+    $dotenv = new Symfony\Component\Dotenv\Dotenv();
+
+    $dotenv->loadEnv(__DIR__.'/../.env.test');
+
+    return str_contains($_ENV['DATABASE_URL'], 'sqlite');
 }
