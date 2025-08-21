@@ -32,11 +32,11 @@
         "twig/twig": "^2.12|^3.21.1"
     },
     "require-dev": {
-        "dama/doctrine-test-bundle": "^8.3",
+        "dama/doctrine-test-bundle": "^8.3.1",
         "doctrine/doctrine-fixtures-bundle": "^4.1",
-        "friendsofphp/php-cs-fixer": "^3.85",
+        "friendsofphp/php-cs-fixer": "^3.86",
         "phpstan/extension-installer": "^1.4.3",
-        "phpunit/phpunit": "^12.3.2",
+        "phpunit/phpunit": "^12.3.6",
         "roave/security-advisories": "dev-latest",
         "symfony/browser-kit": "7.3.*",
         "symfony/css-selector": "7.3.*",
