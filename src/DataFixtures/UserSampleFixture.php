@@ -17,24 +17,29 @@ class UserSampleFixture extends Fixture
     public function load(ObjectManager $manager): void
     {
         $users = [
-            ['username' => 'testRequester', 'password' => 'test', 'email' => 'testRequester@local.com'],
-            ['username' => 'testTechnician', 'password' => 'test', 'email' => 'testTechnician@local.com'],
+            ['username' => 'testRequester', 'password' => 'test', 'email' => 'testRequester@local.com', 'role' => 'ROLE_USER'],
+            ['username' => 'testTechnician', 'password' => 'test', 'email' => 'testTechnician@local.com', 'role' => 'ROLE_TECHNICIAN'],
         ];
 
         foreach ($users as $user) {
             $entity = new User();
-            $entity->setUsername($user['username']);
-            $entity->setPassword($user['password']);
-            $entity->setEmail($user['email']);
-            $entity->setDateCreated(new \DateTimeImmutable());
+
+            $entity
+                ->setUsername($user['username'])
+                ->setPassword($user['password'])
+                ->setEmail($user['email'])
+                ->setDateCreated(new \DateTimeImmutable())
+                ->setRoles([$user['role']])
+            ;
+
             $manager->persist($entity);
+
             $manager->flush();
 
             $this->addReference($user['username'], $entity);
         }
 
-
-        $faker = Factory::create();
+        $faker = Factory::create('en-US');
 
         for ($i = 0; $i < 10; ++$i) {
             $user = new User();

@@ -25,6 +25,8 @@ class UserGroupSampleFixture extends Fixture implements DependentFixtureInterfac
             ->addMember($userTechnician)
         ;
 
+        $this->addReference('technicianGroup', $technicianGroup);
+
         $manager->persist($technicianGroup);
 
         $userGroup = new UserGroup();

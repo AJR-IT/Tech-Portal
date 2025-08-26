@@ -26,6 +26,8 @@ class StatusSampleFixture extends Fixture
             $entity->setFullName($status['fullName']);
 
             $manager->persist($entity);
+
+            $this->addReference('status-'.strtolower($status['friendlyName']), $entity);
         }
 
         $manager->flush();

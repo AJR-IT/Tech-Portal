@@ -31,14 +31,13 @@ class DeviceSampleFixture extends Fixture implements DependentFixtureInterface
                 ->setSerialNumber('ZYX'.$i.random_int(1, 100))
             ;
 
-
             if ($i % 2) {
                 $user = $this->getReference('testRequester', User::class);
-                $device->setAssignedTo($user);
             } else {
                 $user = $this->getReference('testTechnician', User::class);
-                $device->setAssignedTo($user);
             }
+
+            $device->setAssignedTo($user);
 
             $manager->persist($device);
         }

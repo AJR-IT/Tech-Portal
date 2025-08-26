@@ -103,7 +103,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private bool $canLogIn = false;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $defaultStartingPage = null;
+    private ?string $defaultStartingPage = 'app_dashboard';
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $lastLogonDate = null;
@@ -112,7 +112,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $lsatLogonIp = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $ticketDateFormat = null;
+    private ?string $ticketDateFormat = 'Y-m-d H:i:s';
 
     /**
      * @var Collection<int, Device>
