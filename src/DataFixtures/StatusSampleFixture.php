@@ -6,7 +6,7 @@ use App\Entity\Status;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 
-class StatusFixture extends Fixture
+class StatusSampleFixture extends Fixture
 {
     public function load(ObjectManager $manager): void
     {

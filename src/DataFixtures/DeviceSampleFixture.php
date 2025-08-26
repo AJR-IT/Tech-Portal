@@ -3,11 +3,13 @@
 namespace App\DataFixtures;
 
 use App\Entity\Device;
+use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Random\RandomException;
 
-class DeviceSampleFixture extends Fixture
+class DeviceSampleFixture extends Fixture implements DependentFixtureInterface
 {
     /**
      * @throws \DateMalformedStringException
@@ -29,9 +31,25 @@ class DeviceSampleFixture extends Fixture
                 ->setSerialNumber('ZYX'.$i.random_int(1, 100))
             ;
 
+
+            if ($i % 2) {
+                $user = $this->getReference('testRequester', User::class);
+                $device->setAssignedTo($user);
+            } else {
+                $user = $this->getReference('testTechnician', User::class);
+                $device->setAssignedTo($user);
+            }
+
             $manager->persist($device);
         }
 
         $manager->flush();
+    }
+
+    public function getDependencies(): array
+    {
+        return [
+            UserSampleFixture::class,
+        ];
     }
 }

@@ -28,13 +28,13 @@ function main($argv): void
             run('php bin/console --env=test doctrine:fixtures:load --no-interaction');
             run('php bin/console cache:clear --no-warmup');
             break;
-        case 'local:setup':
+        case 'dev:setup':
             run('php bin/console doctrine:database:drop --no-interaction --force --if-exists');
             run('php bin/console doctrine:database:create --no-interaction');
             run('php bin/console doctrine:schema:create --no-interaction');
             run('php bin/console doctrine:fixtures:load --no-interaction');
             run('php bin/console cache:clear --no-warmup');
-            removeLockFile();
+            setLockFile();
     }
 }
 
@@ -54,6 +54,14 @@ function removeLockFile(): void
 
     if (file_exists($lockFile)) {
         unlink($lockFile);
+    }
+}
+
+function setLockFile(): void
+{
+    $lockFile = __DIR__.'/../var/install.lock';
+    if (!file_exists($lockFile)) {
+        fopen($lockFile, 'wb');
     }
 }
 
