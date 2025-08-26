@@ -43,32 +43,9 @@ class Device
     #[ORM\ManyToOne(inversedBy: 'assignedDevices')]
     private ?User $assignedTo = null;
 
-    #[Assert\Callback]
-    public function validate(ExecutionContextInterface $context, $payload): void
-    {
-        if ($this->dateWarrantyStart && $this->dateWarrantyEnd && $this->dateWarrantyStart > $this->dateWarrantyEnd) {
-            $context->buildViolation('The warranty start date must be before the warranty end date.')
-                ->atPath('dateWarrantyStart')
-                ->addViolation();
-        }
-    }
-
-    /**
-     * Get devices unique identifier.
-     *
-     * @return mixed
-     */
-    public function getUniqueIdentifier(): mixed
-    {
-        return $this->assetTag;
-    }
-
     /**
      * Generate a random string. Can be used for asset tags, serial numbers, etc.
      *
-     * @param int $length
-     * @param string $keyspace
-     * @return string
      * @throws RandomException
      */
     public function generateRandomString(int $length = 7, string $keyspace = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'): string

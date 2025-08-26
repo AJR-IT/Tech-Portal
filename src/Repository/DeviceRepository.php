@@ -17,63 +17,41 @@ class DeviceRepository extends ServiceEntityRepository
         parent::__construct($registry, Device::class);
     }
 
-    /**
-     * @param array $deviceData
-     * @return Device|null
-     */
-    public function createDevices(array $deviceData): ?Device
+    public function create(array $deviceData): ?Device
     {
-        $data = [
-            'assetTag' => $deviceData['assetTag'] ?? null,
-            'serialNumber' => $deviceData['serialNumber'] ?? null,
-            'assignedTo' => ($deviceData['assignedTo'] instanceof User) ? $deviceData['assignedTo'] : null,
-            'decommissioned' => $deviceData['decommissioned'] ?? null, // todo let default behavior be set in config
-            'datePurchased' => ($deviceData['datePurchased'] instanceof \DateTimeImmutable) ? $deviceData['datePurchased'] : null,
-            'dateWarrantyStart' => ($deviceData['dateWarrantyStart'] instanceof \DateTimeImmutable) ? $deviceData['dateWarrantyStart'] : null,
-            'dateWarrantyEnd' => ($deviceData['dateWarrantyEnd'] instanceof \DateTimeImmutable) ? $deviceData['dateWarrantyEnd'] : null,
-        ];
+        try {
+            $data = [
+                'assetTag' => $deviceData['assetTag'] ?? null,
+                'serialNumber' => $deviceData['serialNumber'] ?? null,
+                'assignedTo' => (array_key_exists('assignedTo', $deviceData) && $deviceData['assignedTo'] instanceof User) ? $deviceData['assignedTo'] : null,
+                'decommissioned' => $deviceData['decommissioned'] ?? null, // todo let default behavior be set in config
+                'datePurchased' => (array_key_exists('datePurchased', $deviceData) && $deviceData['datePurchased'] instanceof \DateTimeImmutable) ? $deviceData['datePurchased'] : null,
+                'dateWarrantyStart' => (array_key_exists('dateWarrantyStart', $deviceData) && $deviceData['dateWarrantyStart'] instanceof \DateTimeImmutable) ? $deviceData['dateWarrantyStart'] : null,
+                'dateWarrantyEnd' => (array_key_exists('dateWarrantyEnd', $deviceData) && $deviceData['dateWarrantyEnd'] instanceof \DateTimeImmutable) ? $deviceData['dateWarrantyEnd'] : null,
+            ];
 
-        $device = new Device();
+            $newDevice = new Device();
 
-        $device
-            ->setAssetTag($data['assetTag'])
-            ->setDateCreated(new \DateTimeImmutable())
-            ->setDateModified(new \DateTimeImmutable())
-            ->setAssignedTo($data['assignedTo'])
-            ->setDecommissioned($data['decommissioned'])
-            ->setDatePurchased($data['datePurchased'])
-            ->setDateWarrantyEnd($data['dateWarrantyEnd'])
-            ->setDateWarrantyStart($data['dateWarrantyStart'])
-            ->setSerialNumber($data['serialNumber'])
-        ;
+            $newDevice
+                ->setAssetTag($data['assetTag'])
+                ->setDateCreated(new \DateTimeImmutable())
+                ->setDateModified(new \DateTimeImmutable())
+                ->setAssignedTo($data['assignedTo'])
+                ->setDecommissioned($data['decommissioned'])
+                ->setDatePurchased($data['datePurchased'])
+                ->setDateWarrantyEnd($data['dateWarrantyEnd'])
+                ->setDateWarrantyStart($data['dateWarrantyStart'])
+                ->setSerialNumber($data['serialNumber'])
+            ;
 
-        $this->getEntityManager()->persist($device);
+            $this->getEntityManager()->persist($newDevice);
 
-        $this->getEntityManager()->flush();
+            $this->getEntityManager()->flush();
+        } catch (\Exception) {
+            return null;
+        }
 
-        return $device;
-    }
-
-    /**
-     * @param array $deviceIds
-     * @return array
-     */
-    public function findById(array $deviceIds): array
-    {
-        return $this->createQueryBuilder('device')
-            ->andWhere('device.id IN (:deviceIds)')
-            ->setParameter('deviceIds', $deviceIds)
-            ->getQuery()
-            ->getResult();
-    }
-
-    /**
-     * @param array $filter
-     * @return array
-     */
-    public function getDevices(array $filter = []): array
-    {
-        return $this->findBy($filter);
+        return $newDevice;
     }
 
     public function decommissionDevices(array $ids): void
