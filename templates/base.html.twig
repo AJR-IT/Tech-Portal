@@ -4,7 +4,12 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>{% block title %}Tech Portal{% endblock %}</title>
-        {% block stylesheets %}{% endblock %}
+        {% block stylesheets %}
+            <link rel="styelsheet" href="{{ asset('components/jquery-ui/jquery-ui.min.css') }}"/>
+            <link rel="stylesheet" href="{{ asset('components/jquery-ui/jquery-ui.structure.min.css') }}"/>
+            <link rel="stylesheet" href="{{ asset('components/jquery-ui/jquery-ui.theme.min.css') }}"/>
+            <link rel="stylesheet" href="{{ asset('css/app.css') }}"/>
+        {% endblock %}
 
     </head>
     <body>
@@ -38,6 +43,8 @@
 
         {% block javascripts %}
             {% block importmap %}{{ importmap('app') }}{% endblock %}
+            <script src="{{ asset('components/jquery/jquery.min.js') }}"></script>
+            <script src="{{ asset('components/jquery-ui/jquery-ui.min.js') }}"></script>
         {% endblock %}
     </body>
 </html>
