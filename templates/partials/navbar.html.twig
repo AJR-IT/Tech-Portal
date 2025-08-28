@@ -1,44 +1,50 @@
-<!-- Navbar -->
-<nav class="navbar navbar-expand-lg fixed-top border-bottom shadow-sm">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="#">📦 Device Manager</a>
+{#<!-- Navbar -->#}
+{#<nav class="navbar navbar-expand-lg fixed-top border-bottom shadow-sm">#}
+{#    <div class="container-fluid">#}
+{#        <a class="navbar-brand" href="#">📦 Device Manager</a>#}
 
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#topNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+{#        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#topNav">#}
+{#            <span class="navbar-toggler-icon"></span>#}
+{#        </button>#}
 
-        <div class="collapse navbar-collapse justify-content-between" id="topNav">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item"><a class="nav-link active" href="#">Dashboard</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Devices</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Users</a></li>
-                <li class="nav-item"><a class="nav-link" href="{{ path('app_ticket_index') }}">Tickets</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Repairs</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Reports</a></li>
-            </ul>
+{#        <div class="collapse navbar-collapse justify-content-between" id="topNav">#}
+{#            <ul class="navbar-nav me-auto mb-2 mb-lg-0">#}
+{#                <li class="nav-item"><a class="nav-link active" href="#">Dashboard</a></li>#}
+{#                <li class="nav-item"><a class="nav-link" href="#">Devices</a></li>#}
+{#                <li class="nav-item"><a class="nav-link" href="#">Users</a></li>#}
+{#                <li class="nav-item"><a class="nav-link" href="{{ path('app_ticket_index') }}">Tickets</a></li>#}
+{#                <li class="nav-item"><a class="nav-link" href="#">Repairs</a></li>#}
+{#                <li class="nav-item"><a class="nav-link" href="#">Reports</a></li>#}
+{#            </ul>#}
 
-            <!-- User Dropdown -->
-            <ul class="navbar-nav mb-2 mb-lg-0">
-                <li class="nav-item dropdown">
-                    <button class="nav-link dropdown-toggle d-flex align-items-center" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-person-circle fs-4 me-2"></i>
-                        <span>{{ app.user.getLastName() ~ ', ' ~ app.user.getFirstName(0) }}</span>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="{{ path('app_user_profile') }}">👤 My Profile</a></li>
-                        <li><a class="dropdown-item" href="#">🛠 Admin Panel</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li class="px-3">
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" role="switch" id="themeToggleDropdown">
-                                <label class="form-check-label" for="themeToggleDropdown">Dark Mode</label>
-                            </div>
-                        </li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item text-danger" href="{{ path('app_logout') }}">🚪 Sign Out</a></li>
-                    </ul>
-                </li>
-            </ul>
-        </div>
-    </div>
+{#            <!-- User Dropdown -->#}
+{#            <ul class="navbar-nav mb-2 mb-lg-0">#}
+{#                <li class="nav-item dropdown">#}
+{#                    <button class="nav-link dropdown-toggle d-flex align-items-center" role="button" data-bs-toggle="dropdown" aria-expanded="false">#}
+{#                        <i class="bi bi-person-circle fs-4 me-2"></i>#}
+{#                        <span>{{ app.user.getLastName() ~ ', ' ~ app.user.getFirstName(0) }}</span>#}
+{#                    </button>#}
+{#                    <ul class="dropdown-menu dropdown-menu-end">#}
+{#                        <li><a class="dropdown-item" href="{{ path('app_user_profile') }}">👤 My Profile</a></li>#}
+{#                        <li><a class="dropdown-item" href="#">🛠 Admin Panel</a></li>#}
+{#                        <li><hr class="dropdown-divider"></li>#}
+{#                        <li class="px-3">#}
+{#                            <div class="form-check form-switch">#}
+{#                                <input class="form-check-input" type="checkbox" role="switch" id="themeToggleDropdown">#}
+{#                                <label class="form-check-label" for="themeToggleDropdown">Dark Mode</label>#}
+{#                            </div>#}
+{#                        </li>#}
+{#                        <li><hr class="dropdown-divider"></li>#}
+{#                        <li><a class="dropdown-item text-danger" href="{{ path('app_logout') }}">🚪 Sign Out</a></li>#}
+{#                    </ul>#}
+{#                </li>#}
+{#            </ul>#}
+{#        </div>#}
+{#    </div>#}
+{#</nav>#}
+
+<nav class="navbar">
+    <a href="#" aria-current="page">Dashboard</a>
+    <a href="#">Current</a>
+    <a href="#">Users</a>
 </nav>
