@@ -60,12 +60,19 @@ class RecoverAdminUserCommand extends Command
 
         $user = $this->userRepository->findOneBy(['username' => $username]);
 
+        $persist = false;
+
         if (!$user instanceof User) {
+            $persist = true;
+
             $user = new User();
-            $user->setEmail($this->defaultCredenetials['email']);
-            $user->setDateCreated(new \DateTimeImmutable());
-            $user->setUsername($username);
-            $user->setRoles(['ROLE_ADMIN']);
+            $user->setEmail($this->defaultCredenetials['email'])
+                ->setDateCreated(new \DateTimeImmutable())
+                ->setUsername($username)
+                ->setRoles(['ROLE_ADMIN'])
+                ->setFirstName('Default')
+                ->setLastName('Admin')
+            ;
         }
 
         $user->setPassword(
@@ -78,7 +85,10 @@ class RecoverAdminUserCommand extends Command
             $user->setRoles(['ROLE_ADMIN']);
         }
 
-        $this->entityManager->persist($user);
+        if ($persist) {
+            $this->entityManager->persist($user);
+        }
+
         $this->entityManager->flush();
 
         $this->io->success(
