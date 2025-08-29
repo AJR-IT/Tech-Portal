@@ -16,6 +16,7 @@ body {
 }
 
 .navbar {
+    height: 45px;
     background-color: var(--bs-light-bg-subtle);
     border-bottom: 2px solid var(--accent-color);
 }

@@ -1,36 +1,21 @@
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="auto">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>{% block title %}Tech Portal{% endblock %}</title>
-        {% block stylesheets %}
-            <link rel="styelsheet" href="{{ asset('components/jquery-ui/jquery-ui.min.css') }}"/>
-            <link rel="stylesheet" href="{{ asset('components/jquery-ui/jquery-ui.structure.min.css') }}"/>
-            <link rel="stylesheet" href="{{ asset('components/jquery-ui/jquery-ui.theme.min.css') }}"/>
-            <link rel="stylesheet" href="{{ asset('css/app.css') }}"/>
-        {% endblock %}
-
-    </head>
-    <body>
-        {% if app.user is not null %}
-            {% include 'partials/navbar.html.twig' %}
-        {% endif %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Tech Portal{% endblock %}</title>
+    {% block stylesheets %}{% endblock %}
+</head>
+<body>
+{% if app.user is not null %}
+    {% include 'partials/navbar.html.twig' %}
+{% endif %}
 
         <div class="container-fluid content-wrapper bg-dark-subtle" style="min-height: 100vh;">
             <div class="m-2">
                 <div class="row">
                     <div class="card shadow-sm py-3">
                         {% block body %}
-                            <h1>Welcome to Device Tracker</h1>
-                            <p class="text-muted">Manage devices, assign users, track repairs, and build reports.</p>
-
-                            <div class="card shadow-sm">
-                                <div class="card-body">
-                                    <h5 class="card-title">Getting Started</h5>
-                                    <p class="card-text">Start by adding devices or users, or import from your existing inventory system.</p>
-                                </div>
-                            </div>
                         {% endblock %}
                     </div>
                 </div>
@@ -39,12 +24,12 @@
 
         {% include 'partials/aside.html.twig' %}
 
-        {% block modal %}{% endblock %}
+{% block modal %}{% endblock %}
 
-        {% block javascripts %}
-            {% block importmap %}{{ importmap('app') }}{% endblock %}
-            <script src="{{ asset('components/jquery/jquery.min.js') }}"></script>
-            <script src="{{ asset('components/jquery-ui/jquery-ui.min.js') }}"></script>
-        {% endblock %}
-    </body>
+{% block javascripts %}
+    {% block importmap %}{{ importmap('app') }}{% endblock %}
+    <script src="{{ asset('components/jquery/jquery.min.js') }}"></script>
+    <script src="{{ asset('components/jquery-ui/jquery-ui.min.js') }}"></script>
+{% endblock %}
+</body>
 </html>
